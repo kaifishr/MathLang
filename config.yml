@@ -1,0 +1,75 @@
+tag: ""
+random_seed: 42
+
+##############
+# Dataloader #
+##############
+dataloader:
+  # "arithmetic", "algebraic", "boolean" 
+  dataset: "arithmetic"
+  num_workers: 0
+
+#########
+# Model #
+#########
+model:
+  # type: convmixer, mlpmixer, cnn, transformer
+  type: "cnn"
+  num_blocks: 8
+  input_sequence_length: 256
+  output_sequence_length: 1
+  embedding_dim: 64
+  expansion_factor: 1  # only for MLP-Mixer
+  kernel_size: 3       # only for ConvMixer / CNN
+
+###########
+# Trainer #
+###########
+trainer:
+  # gpu, cpu
+  device: "gpu"
+  num_update_steps: 10000000
+  batch_size: 128
+  learning_rate: 1.0e-4
+  weight_decay: 0
+  gradient_clipping:
+    is_activated: false
+    max_norm: 1.0
+
+load_model:
+  is_activated: false 
+  model_name: "arithmetic"
+  model_path: -1
+
+########
+# Data #
+########
+data:
+  n_classes: Null
+  input_shape: Null
+
+###########
+# Summary #
+###########
+summary:
+  save_train_stats:
+    every_n_updates: 100
+  save_test_stats:
+    every_n_updates: -1
+  save_model:
+    every_n_updates: 1000
+  add_position_embeddings:
+    every_n_updates: 1000
+  add_token_embeddings:
+    every_n_updates: 1000
+  add_linear_weights:
+    every_n_updates: 1000
+  add_graph: false
+
+###############
+# Directories #
+###############
+dirs:
+  data: "data"
+  runs: "runs"
+  weights: "weights"
