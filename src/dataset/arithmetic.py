@@ -1,6 +1,7 @@
 """Arithmetic dataset.
 
-Generates arithmetic sequences and their solution using Python's `eval()` method.
+Generates arithmetic sequences and their solution using Python's 
+'eval()' method.
 
 Typical usage example:
     TODO
@@ -8,20 +9,16 @@ Typical usage example:
 """
 import collections
 import random
-import time
 
 import torch
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import IterableDataset
 
-from sympy.parsing.sympy_parser import parse_expr
-from sympy import simplify
-
 torch.manual_seed(42)
 random.seed(42)
 
 
-class ArithmeticExpressionDataset(IterableDataset):
+class ArithmeticDataset(IterableDataset):
     """Creates an iterable dataset of arithmetic expressions.
 
     Creates arithmetical problems. For example, if the following parameters
@@ -62,24 +59,22 @@ class ArithmeticExpressionDataset(IterableDataset):
         Args:
             len_expression: An integer defining the number of iterations to create arithmetic expression.
             max_number: An integer defining the largest scalar value.
-            operator_set: A string indicating which operator set to choose.
+            operators: A string indicating which operator set to choose.
+            scalars:
         """
         super().__init__()
 
         self.len_expression = len_expression
-
-        # Operator set
         self.operators = list(self.operator_set)
-        print(f"{self.operators = }")
-
         self.scalars = list(map(str, range(self.max_number)))
 
+        # List of all characters used for arithmetic expressions is comprised
+        # of scalar values, operators, brackets, and blank spaces for padding.
         chars = self.scalars + self.operators + ["(", ")"] + [" "]
+
+        # Lookup table for character-index-translation.
         self.char_to_idx = {char: idx for idx, char in enumerate(chars)}
         self.idx_to_char = {idx: char for idx, char in enumerate(chars)}
-        print(f"{chars = }")
-        print(f"{self.char_to_idx = }")
-        print(f"{self.idx_to_char = }")
 
         self.max_input_length = (
             max_input_length if max_input_length else self._max_input_length()
@@ -87,18 +82,20 @@ class ArithmeticExpressionDataset(IterableDataset):
         self.max_output_length = (
             max_output_length if max_output_length else self._max_output_length()
         )
-        print(f"{self.max_input_length = }")
-        print(f"{self.max_output_length = }")
+
+        self.num_tokens = len(self.char_to_idx)
 
     def _max_input_length(self) -> int:
         """Computes maximum input lenght for padding.
 
+        TODO: Generalize this function to work with all operators..
+
         Returns:
             Maximum length of input.
         """
-        max_len_term = (
-            5  # Maximum length of a single term equals five characters: (a+b)
-        )
+        # Maximum length of a single term equals five characters: (a+b)
+        #                                                         12345
+        max_len_term = 5  
         len_operator = 1
         len_brackets = 2
         return max_len_term + self.len_expression * (
@@ -108,15 +105,15 @@ class ArithmeticExpressionDataset(IterableDataset):
     def _max_output_length(self) -> int:
         """Computes maximum output lenght for padding.
 
+        TODO: Currently, the computation only works for the +- operators set 
+        as it does not consider multiplication. Generalize for +-*.
+
         Returns:
             Maximum length of input.
         """
-        # NOTE: Currently, the computation only works for the +- operators set as it does not consider multiplication.
-        len_largest_result = len(
-            str((1 + self.len_expression) * 2 * (self.max_number - 1))
-        )
+        max_len_result = len(str((1 + self.len_expression) * 2 * (self.max_number - 1)))
         len_unary_opeartor = 1
-        return len_unary_opeartor + len_largest_result
+        return len_unary_opeartor + max_len_result
 
     def _get_term(self) -> str:
         """Generates random term of random length."""
@@ -159,17 +156,11 @@ class ArithmeticExpressionDataset(IterableDataset):
             expression = self.generate_expression()
             result = str(eval(expression))
 
-            print(f"{expression = }")
-            print(f"{len(expression) = }")
-            print(f"{result = }")
-            print(f"{len(result) = }")
-
-            # Add padding so that expressions and results have always the same length.
+            # Add padding so that expressions and results have the same length.
             expression = expression.ljust(self.max_input_length, " ")
             result = result.ljust(self.max_output_length, " ")
 
-            # TODO: Add padding to expression and result.
-            # Encode expression and result using translation table.
+            # Encode expression and result using lookup table.
             x_encoded = [self.char_to_idx[char] for char in expression]
             y_encoded = [self.char_to_idx[char] for char in result]
             x_data = torch.tensor(data=x_encoded, dtype=torch.long)
@@ -179,9 +170,8 @@ class ArithmeticExpressionDataset(IterableDataset):
 
 
 def main():
-    print("\nArithmeticExpressionDataset\n")
-    dataset = ArithmeticExpressionDataset()
-    dataloader = DataLoader(dataset, batch_size=2, num_workers=0)
+    dataset = ArithmeticDataset()
+    dataloader = DataLoader(dataset, batch_size=2, num_workers=2)
 
     for i, (x, y) in enumerate(dataloader):
         print(f"{x = }")

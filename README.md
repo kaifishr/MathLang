@@ -1,6 +1,8 @@
 # MathNet
 
-Investigating the capabilities of neural networks to solve math problems and possible applications of pre-training on algebraic expressions.
+Investigating the capabilities of neural networks to solve math problems and 
+possible applications of pre-training on algebraic expressions for natural 
+language processing.
 
 ## TODOs
 

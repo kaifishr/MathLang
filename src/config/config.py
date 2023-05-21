@@ -59,7 +59,6 @@ def init_config(file_path: str) -> Config:
 
     Returns:
         Config class.
-
     """
     # Load yaml file as dictionary.
     config = load_config(file_path=file_path)
@@ -67,7 +66,6 @@ def init_config(file_path: str) -> Config:
     # Convert dictionary to configuration class.
     config = Config(d=config)
 
-    Path(config.dirs.data).mkdir(parents=True, exist_ok=True)
     Path(config.dirs.runs).mkdir(parents=True, exist_ok=True)
     Path(config.dirs.weights).mkdir(parents=True, exist_ok=True)
 
@@ -89,7 +87,6 @@ def load_config(file_path: str) -> dict:
 
     Returns:
         Dictionary holding content of yaml file.
-
     """
     with open(file_path, "r") as fp:
         try:
