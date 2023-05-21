@@ -14,10 +14,9 @@ dataloader:
 #########
 model:
   # type: convmixer, mlpmixer, cnn, transformer
-  type: "mlpmixer"
+  type: "cnn"
   num_blocks: 4
   # input_sequence_length: 256
-  # output_sequence_length: 1
   embedding_dim: 64
   expansion_factor: 1  # only for MLP-Mixer
   kernel_size: 3       # only for ConvMixer / CNN

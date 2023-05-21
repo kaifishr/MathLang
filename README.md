@@ -6,6 +6,7 @@ language processing.
 
 ## TODOs
 
+- Add encoder-only transformer model.
 - Try to avoid padding at output for simple arithmetic problems.
 - Adjust loss function to ignore padding at output.
 - Compute correct max input and output length for padding.
