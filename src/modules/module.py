@@ -407,61 +407,6 @@ class ConvClassifier(nn.Module):
         return x
 
 
-class ImageToSequence(nn.Module):
-    """Transforms image into sequence.
-
-    Performs an embedding of images into a sequence.
-
-    Attributes:
-        sequence_length:
-        embedding_dim:
-    """
-
-    def __init__(self, config: Config) -> None:
-        """Initializes ImageToSequence module."""
-        super().__init__()
-
-        cfg_attention = config.transformer.self_attention
-        self.sequence_length = cfg_attention.sequence_length
-        self.embedding_dim = cfg_attention.n_heads * cfg_attention.head_dim
-
-        img_channels, img_height, img_width = config.data.input_shape
-
-        patch_size = config.transformer.image_to_sequence.patch_size
-
-        assert (img_height % patch_size == 0) and (img_width % patch_size == 0)
-
-        self.conv = nn.Conv2d(
-            in_channels=img_channels,
-            out_channels=self.sequence_length,
-            kernel_size=(patch_size, patch_size),
-            stride=(patch_size, patch_size),
-        )
-
-        self.linear = nn.Linear(
-            in_features=(img_height // patch_size) * (img_width // patch_size),
-            out_features=self.embedding_dim,
-        )
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward method.
-
-        We don't need an extra embedding or positional encoding when  we
-        work with image data.
-
-        Images are of size (batch_size, num_channels * width * height) and
-        are transformed to size (batch_size, sequence_size * embedding_dim)
-
-        Returns:
-            Tensor representing sequence of tokens.
-        """
-        x = self.conv(x)
-        x = torch.flatten(input=x, start_dim=2, end_dim=-1)
-        x = self.linear(x)
-        x = x.view(-1, self.sequence_length, self.embedding_dim)
-        return x
-
-
 class TokenEmbedding(nn.Module):
     """Token embedding module.
 
@@ -771,16 +716,6 @@ class TransformerBlock(nn.Module):
         return x
 
 
-class SwapAxes(nn.Module):
-    def __init__(self, axis0: int, axis1):
-        super().__init__()
-        self.axis0 = axis0
-        self.axis1 = axis1
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return torch.swapaxes(x, axis0=self.axis0, axis1=self.axis1)
-
-
 class TokenClassifier(nn.Module):
     """Classifier for next token prediction."""
 
@@ -795,55 +730,3 @@ class TokenClassifier(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.classifier(x)
-
-
-class SequenceClassifier(nn.Module):
-    """Classifier for next sequence prediction."""
-
-    def __init__(self, config: Config) -> None:
-        """Initializes Classifier class."""
-        super().__init__()
-
-        max_sequence_length = config.transformer.max_sequence_length
-        out_sequence_length = config.transformer.out_sequence_length
-        num_heads = config.transformer.self_attention.n_heads
-        head_dim = config.transformer.self_attention.head_dim
-        embedding_dim = num_heads * head_dim
-        num_classes = config.data.num_tokens
-
-        self.classifier = nn.Sequential(
-            nn.LayerNorm(embedding_dim),
-            SwapAxes(axis0=-2, axis1=-1),
-            nn.Linear(in_features=max_sequence_length, out_features=out_sequence_length),
-            SwapAxes(axis0=-2, axis1=-1),
-            nn.Linear(in_features=embedding_dim, out_features=num_classes),
-        )
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.classifier(x)
-        return x
-
-
-# class Classifier(nn.Module):
-#     """Transforms attention head outputs to class predictions."""
-# 
-#     def __init__(self, config: Config) -> None:
-#         """Initializes the classifier."""
-#         super().__init__()
-#         cfg_attention = config.transformer.self_attention
-#         sequence_length = (
-#             cfg_attention.sequence_length
-#         )  # TODO: For image transformer use here "config.transformer.img_to_sequence.sequence_length"
-#         embedding_dim = cfg_attention.n_heads * cfg_attention.head_dim
-#         n_dims_out = config.data.n_classes
-# 
-#         self.linear = nn.Linear(
-#             in_features=sequence_length * embedding_dim,
-#             out_features=n_dims_out,
-#         )
-# 
-#     def forward(self, x: torch.Tensor) -> torch.Tensor:
-#         """Forward method."""
-#         x = torch.flatten(x, start_dim=1)
-#         out = self.linear(x)
-#         return out

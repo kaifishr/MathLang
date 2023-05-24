@@ -92,12 +92,11 @@ class ConvModel(nn.Module):
         return x
 
 
-class CharacterTransformer(nn.Module):
-    """Character-level isotropic multi-head self-attention
-    transformer neural network."""
+class Transformer(nn.Module):
+    """Isotropic multi-head self-attention transformer neural network."""
 
     def __init__(self, config: Config):
-        """Initializes image transformer."""
+        """Initializes transformer module."""
         super().__init__()
 
         self.token_embedding = TokenEmbedding(config)
@@ -109,17 +108,7 @@ class CharacterTransformer(nn.Module):
 
         self.classifier = TokenClassifier(config=config)
 
-        self.apply(self._init_weights)
-
-    def _init_weights(self, module: nn.Module):
-        """Initializes weights for all modules of ImageTransformer."""
-        if isinstance(module, (nn.Linear, nn.Conv2d)):
-            torch.nn.init.normal_(module.weight, mean=0.0, std=0.02)
-            if module.bias is not None:
-                torch.nn.init.zeros_(module.bias)
-        elif isinstance(module, nn.LayerNorm):
-            torch.nn.init.zeros_(module.bias)
-            torch.nn.init.ones_(module.weight)
+        self.apply(init_weights)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # TODO: Assert that maximum sequence length is not exceeded.

@@ -62,14 +62,16 @@ def set_random_seed(seed: int = 0, is_cuda_deterministic: bool = False) -> None:
         torch.use_deterministic_algorithms(is_cuda_deterministic)
 
 
-def init_weights(module: nn.Module) -> None:
+def init_weights(module: nn.Module, mean: float = 0.0, std: float = 0.01) -> None:
     """Initializes weights for all modules.
 
     Args:
         module: Network module.
+        mean:
+        std:
     """
-    if isinstance(module, nn.Linear):
-        torch.nn.init.normal_(module.weight, mean=0.0, std=0.005)
+    if isinstance(module, (nn.Linear, nn.Conv2d)):
+        torch.nn.init.normal_(module.weight, mean=mean, std=std)
         if module.bias is not None:
             torch.nn.init.zeros_(module.bias)
     elif isinstance(module, nn.LayerNorm):

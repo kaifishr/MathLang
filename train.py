@@ -4,7 +4,7 @@ from src.dataloader import get_dataloader
 from src.modules.model import MLPMixer
 from src.modules.model import ConvMixer
 from src.modules.model import ConvModel
-# from src.modules.model import Transformer 
+from src.modules.model import Transformer
 from src.trainer.trainer import Trainer
 from src.utils.tools import set_random_seed
 # from src.utils.tools import load_checkpoint
@@ -29,8 +29,8 @@ def run_experiment():
         model = ConvModel(config=config)
     elif model_type == "mlpmixer":
         model = MLPMixer(config=config)
-    # elif model_type == "transformer":
-    #     model = Transformer(config=config)
+    elif model_type == "transformer":
+        model = Transformer(config=config)
     else:
         raise NotImplementedError(f"Model type {model_type} not available.")
 

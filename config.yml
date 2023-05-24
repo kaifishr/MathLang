@@ -21,6 +21,25 @@ model:
   expansion_factor: 1  # only for MLP-Mixer
   kernel_size: 3       # only for ConvMixer / CNN
 
+model_:
+  # type: convmixer, mlpmixer, cnn, transformer
+  type: "cnn"
+  cnn:
+    num_blocks: 4
+    embedding_dim: 64
+    kernel_size: 3
+  convmixer:
+    num_blocks: 4
+    embedding_dim: 64
+    kernel_size: 3
+  mlpmixer:
+    num_blocks: 4
+    embedding_dim: 64
+    expansion_factor: 1
+  transformer:
+    num_blocks: 4
+
+
 ###########
 # Trainer #
 ###########

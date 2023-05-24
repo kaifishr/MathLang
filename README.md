@@ -24,9 +24,14 @@ As algebraic expression, sentences can vary in length and complexity, and serve 
 
 From a structure point of view, both algebraic expressions and sentences have a structured format and they consist of a combination of elements arranged in a specific order to convey meaning.
 
+- Both algebraic expressions and sentences are means of communication as they are designed to carry information and rely on synta and grammatical rules.
+- Terms in an algebraic expression can be related to each other encouraging the network to detect these relationships.
+- Algebraic expressions are well-suited to solve complex relationships between
+term and encourage a neural network to set term into relation and to perform sequential reasoning as algebraic expression are often nested and need to be solved starting from the lowest level upwards.
+
 ## TODOs
 
-- Add encoder-only transformer model.
+- Run training with transformer model.
 - Try to avoid padding at output for simple arithmetic problems.
 - Adjust loss function to ignore padding at output.
 - Compute correct max input and output length for padding.
