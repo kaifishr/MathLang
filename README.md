@@ -29,6 +29,18 @@ From a structure point of view, both algebraic expressions and sentences have a 
 - Algebraic expressions are well-suited to solve complex relationships between
 term and encourage a neural network to set term into relation and to perform sequential reasoning as algebraic expression are often nested and need to be solved starting from the lowest level upwards.
 
+## Simplifying Algebraic Expressions
+
+Simplifying complex algebraic expressions to express them in a more concise and manageable form requires following a set of rules and techniques that have to be learned like:
+
+- Combining terms that have the same variables raised to the same powers
+- Distributing a term to each term inside parentheses (distributive property)
+- Looking for common factors in terms and factoring them out. $4a+2b = 2(2a+b)$
+- Simplifying exponents when they have the same base $a^2 * a^4 = a^6$
+- Utilizing algebraic properties such as the distributive property, commutative property, associative property.
+- Removing unnecessary parentheses if they are not needed.
+- Learning to simplify expressions within parentheses first, then perform any exponents, followed by multiplication and division, and finally addition and subtraction.
+
 ## TODOs
 
 - Run training with transformer model.
