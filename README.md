@@ -1,8 +1,8 @@
 # MathNet
 
-Investigating the capabilities of neural networks to solve math problems and 
-possible applications of pre-training on algebraic expressions for natural 
-language processing.
+Solving arithmetic expressions or simplifying complex algebraic expressions by expressing them in a more concise and manageable form requires a network to follow a certain set of rules and techniques that have to be learned during training and requires some form of reasoning capabilities.
+
+This project investigates the capabilities of neural networks architectures to solve math problems and possible applications of pre-training on mathematical expressions for natural language processing and to test and predict network capabilities.
 
 ## Algebraic Expressions and Sentences
 
@@ -31,7 +31,10 @@ term and encourage a neural network to set term into relation and to perform seq
 
 ## Simplifying Algebraic Expressions
 
-Simplifying complex algebraic expressions to express them in a more concise and manageable form requires following a set of rules and techniques that have to be learned like:
+What makes this task interesting is that mathematical expressions such as arithmetic
+or algebraic expressions can be generated sufficiently fast with arbitrary lenght and complexity. The ease of generating arbitrary complex expressions makes it interesting for experiments where the capabilities of networks want to be tested.
+Besides the high flexibility in generating mathematical expressions, they also test
+the networks reasoning capabilities as simplifying or solving mathematical expressions requires to learn and follow a set of rules and techniques such as
 
 - Combining terms that have the same variables raised to the same powers
 - Distributing a term to each term inside parentheses (distributive property)
@@ -41,9 +44,15 @@ Simplifying complex algebraic expressions to express them in a more concise and 
 - Removing unnecessary parentheses if they are not needed.
 - Learning to simplify expressions within parentheses first, then perform any exponents, followed by multiplication and division, and finally addition and subtraction.
 
+
+## Research Questions
+
+- Analyze loss, accuracy, entropy as a function of network parameters, activations, processed tokens, FLOPS, complexity / lenght of expressions:
+
 ## TODOs
 
+- Add check so that input / output sequence does not exceed length.
 - Run training with transformer model.
 - Try to avoid padding at output for simple arithmetic problems.
-- Adjust loss function to ignore padding at output.
 - Compute correct max input and output length for padding.
+- Adjust loss function to ignore padding at output.
