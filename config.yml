@@ -14,14 +14,43 @@ dataloader:
 #########
 model:
   # type: convmixer, mlpmixer, cnn, transformer
-  type: "cnn"
-  num_blocks: 4
+  type: "transformer"
+  num_blocks: 2
   # input_sequence_length: 256
   embedding_dim: 64
   expansion_factor: 1  # only for MLP-Mixer
   kernel_size: 3       # only for ConvMixer / CNN
 
-model_:
+
+transformer:
+  n_blocks: 4
+  max_sequence_length: 128
+  token_embedding:
+    is_trainable: true
+    # Available encoding schemes: random_normal, sinusoidal
+    encoding: "random_normal" 
+  position_embedding:
+    is_activated: true
+    is_trainable: true
+    # Available encoding schemes: ones, zeros, random_normal, sinusoidal
+    encoding: "zeros" 
+  transformer_block:
+    hidden_expansion: 2
+    dropout_prob: 0
+  self_attention:
+    n_heads: 4
+    head_dim: 16  # embedding dimension is n_heads * head_dim
+    dropout_prob: 0
+    use_bias: true
+  mask:
+    is_activated: true
+    is_trainable: true
+    # Available masks: causal, trainable_additive, trainable_multiplicative 
+    type: "trainable_additive" 
+
+
+# TODO
+__model:
   # type: convmixer, mlpmixer, cnn, transformer
   type: "cnn"
   cnn:

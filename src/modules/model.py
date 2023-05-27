@@ -10,7 +10,6 @@ from src.modules.module import PositionEmbedding
 from src.modules.module import TokenEmbedding
 from src.modules.module import Classifier
 from src.modules.module import ConvClassifier
-from src.modules.module import TokenClassifier
 from src.modules.module import TransformerBlock
 from src.modules.module import PositionEmbedding
 from src.modules.module import TokenEmbedding
@@ -106,7 +105,8 @@ class Transformer(nn.Module):
         blocks = [TransformerBlock(config) for _ in range(n_blocks)]
         self.transformer_blocks = nn.Sequential(*blocks)
 
-        self.classifier = TokenClassifier(config=config)
+        # self.classifier = TokenClassifier(config=config)
+        self.classifier = Classifier(config=config)
 
         self.apply(init_weights)
 

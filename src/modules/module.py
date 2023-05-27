@@ -442,9 +442,6 @@ class TokenEmbedding(nn.Module):
         requires_grad = True if self.cfg_token_embedding.is_trainable else False
         self.embedding = nn.Parameter(data=embedding, requires_grad=requires_grad)
 
-        # TODO: Use PyTorch embedding and assign desired weight?
-        # self.embedding = nn.Embedding(num_embeddings=num_tokens, embedding_dim=embedding_dim)
-
     @staticmethod
     def _sinusoidal_encoding(size: tuple) -> torch.Tensor:
         """Sinusoidal encoding scheme.
@@ -714,19 +711,3 @@ class TransformerBlock(nn.Module):
         x = x + self.attention(self.layer_norm_1(x))
         x = x + self.mlp(self.layer_norm_2(x))
         return x
-
-
-class TokenClassifier(nn.Module):
-    """Classifier for next token prediction."""
-
-    def __init__(self, config: Config) -> None:
-        """Initializes Classifier class."""
-        super().__init__()
-
-        cfg_attention = config.transformer.self_attention
-        embedding_dim = cfg_attention.n_heads * cfg_attention.head_dim
-        num_classes = config.data.num_tokens
-        self.classifier = nn.Linear(embedding_dim, num_classes, bias=False)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.classifier(x)
