@@ -105,7 +105,6 @@ class Transformer(nn.Module):
         blocks = [TransformerBlock(config) for _ in range(n_blocks)]
         self.transformer_blocks = nn.Sequential(*blocks)
 
-        # self.classifier = TokenClassifier(config=config)
         self.classifier = Classifier(config=config)
 
         self.apply(init_weights)

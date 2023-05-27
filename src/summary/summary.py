@@ -11,6 +11,7 @@ from torch.utils.data import DataLoader
 
 from src.modules.module import TokenEmbedding
 from src.modules.module import PositionEmbedding
+from src.modules.module import Mask
 
 
 def add_graph(
@@ -194,3 +195,15 @@ def add_kernel_weights(
                 ax.axis("off")
 
             writer.add_figure(name, figure, global_step)
+
+
+def add_mask_weights(writer: SummaryWriter, model: nn.Module, global_step: int) -> None:
+    """Adds visualization of trainable mask used in self-attention modules to Tensorboard."""
+    for name, module in model.named_modules():
+        if isinstance(module, Mask):
+            if hasattr(module, "mask"):
+                mask = module.mask.detach().cpu()
+                x_min = torch.min(mask)
+                x_max = torch.max(mask)
+                mask_rescaled = (mask - x_min) / (x_max - x_min)
+                writer.add_image(name, mask_rescaled, global_step, dataformats="HW")

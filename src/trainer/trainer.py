@@ -12,6 +12,7 @@ from src.summary.summary import add_token_embedding_weights
 from src.summary.summary import add_position_embedding_weights
 from src.summary.summary import add_linear_weights
 from src.summary.summary import add_kernel_weights
+from src.summary.summary import add_mask_weights
 
 
 class Trainer:
@@ -192,15 +193,12 @@ class Trainer:
 
         if config.summary.add_token_embeddings.every_n_updates > 0:
             if update_step % config.summary.add_token_embeddings.every_n_updates == 0:
-                add_token_embedding_weights(
-                    model=model, writer=writer, global_step=update_step
-                )
+                add_token_embedding_weights(model=model, writer=writer, global_step=update_step)
 
         if config.summary.add_position_embeddings.every_n_updates > 0:
-            if (
-                update_step % config.summary.add_position_embeddings.every_n_updates
-                == 0
-            ):
-                add_position_embedding_weights(
-                    model=model, writer=writer, global_step=update_step
-                )
+            if (update_step % config.summary.add_position_embeddings.every_n_updates == 0):
+                add_position_embedding_weights(model=model, writer=writer, global_step=update_step)
+
+        if config.summary.add_mask_weights.every_n_updates > 0:
+            if (update_step % config.summary.add_mask_weights.every_n_updates == 0):
+                add_mask_weights(model=model, writer=writer, global_step=update_step)

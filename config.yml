@@ -24,7 +24,7 @@ model:
 
 transformer:
   n_blocks: 4
-  max_sequence_length: 128
+  max_sequence_length: 48  # Let this be determined by dataset.
   token_embedding:
     is_trainable: true
     # Available encoding schemes: random_normal, sinusoidal
@@ -110,6 +110,8 @@ summary:
   add_token_embeddings:
     every_n_updates: 1000
   add_linear_weights:
+    every_n_updates: 1000
+  add_mask_weights:
     every_n_updates: 1000
   add_graph: false
 
