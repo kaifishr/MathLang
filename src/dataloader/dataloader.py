@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 
 from src.config.config import Config
 from src.dataset import ArithmeticDataset
+from src.dataset import AlgebraicDataset
 
 
 def seed_worker(worker_id):
@@ -22,20 +23,22 @@ def get_dataloader(config: Config) -> tuple[DataLoader, DataLoader]:
     batch_size = config.trainer.batch_size
 
     if dataset == "arithmetic":
-
         train_dataset = ArithmeticDataset()
-        valid_dataset = train_dataset
-        config.model.input_sequence_length = train_dataset.max_input_length
-        config.model.output_sequence_length = train_dataset.max_output_length
-        config.data.num_classes = train_dataset.num_tokens  # TODO: Check for redundancy
-        config.data.num_tokens = train_dataset.num_tokens
+        valid_dataset = train_dataset  # TODO: Remove.
 
     elif dataset == "algebraic":
-        raise NotImplementedError(f"Dataloader for {dataset} not implemented.")
+        train_dataset = AlgebraicDataset()
+        valid_dataset = train_dataset
+
     elif dataset == "boolean":
         raise NotImplementedError(f"Dataloader for {dataset} not implemented.")
     else:
         raise NotImplementedError(f"Dataloader for {dataset} not implemented.")
+
+    config.model.input_sequence_length = train_dataset.max_input_length
+    config.model.output_sequence_length = train_dataset.max_output_length
+    config.data.num_classes = train_dataset.num_tokens  # TODO: Check for redundancy
+    config.data.num_tokens = train_dataset.num_tokens
 
     generator = torch.Generator()
     generator.manual_seed(config.random_seed)
@@ -54,7 +57,7 @@ def get_dataloader(config: Config) -> tuple[DataLoader, DataLoader]:
         pin_memory=pin_memory,
     )
 
-    test_loader = torch.utils.data.DataLoader(
+    valid_loader = torch.utils.data.DataLoader(
         dataset=valid_dataset,
         batch_size=2 * batch_size,
         num_workers=num_workers,
@@ -63,4 +66,4 @@ def get_dataloader(config: Config) -> tuple[DataLoader, DataLoader]:
         pin_memory=pin_memory,
     )
 
-    return train_loader, test_loader
+    return train_loader, valid_loader
