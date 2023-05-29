@@ -2,7 +2,7 @@
 
 Solving arithmetic expressions or simplifying complex algebraic expressions by expressing them in a more concise and manageable form requires a network to follow a certain set of rules and techniques that have to be learned during training and requires some form of reasoning capabilities.
 
-This project investigates the capabilities of neural networks architectures to solve math problems and possible applications of pre-training on mathematical expressions for natural language processing and to test and predict network capabilities.
+This project investigates the capabilities of neural networks architectures to solve math problems and possible applications of pre-training on mathematical expressions for natural language processing and to test and predict network capabilities. Due to the interesting properties of mathematical expressions of arbitrary complexity, this project is potentially interesting to test neural network architectures designed for natural language processing.
 
 ## Algebraic Expressions and Sentences
 
@@ -51,8 +51,8 @@ the networks reasoning capabilities as simplifying or solving mathematical expre
 
 ## TODOs
 
+- Use same position and token embedding for all models. 
 - Add check so that input / output sequence does not exceed length.
-- Run training with transformer model.
 - Try to avoid padding at output for simple arithmetic problems.
 - Compute correct max input and output length for padding.
 - Adjust loss function to ignore padding at output.
