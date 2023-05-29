@@ -6,7 +6,7 @@ random_seed: 42
 ##############
 dataloader:
   # "arithmetic", "algebraic", "boolean" 
-  dataset: "arithmetic"
+  dataset: "algebraic"
   num_workers: 2
 
 #########
@@ -15,16 +15,16 @@ dataloader:
 model:
   # type: convmixer, mlpmixer, cnn, transformer
   type: "transformer"
-  num_blocks: 2
+  num_blocks: 4
   # input_sequence_length: 256
-  embedding_dim: 64
+  embedding_dim: 256   # For transformer: n_heads * head_dim!
   expansion_factor: 1  # only for MLP-Mixer
   kernel_size: 3       # only for ConvMixer / CNN
 
 
 transformer:
   n_blocks: 4
-  max_sequence_length: 48  # Let this be determined by dataset.
+  max_sequence_length: 64  # Let this be determined by dataset.
   token_embedding:
     is_trainable: true
     # Available encoding schemes: random_normal, sinusoidal
@@ -39,7 +39,7 @@ transformer:
     dropout_prob: 0
   self_attention:
     n_heads: 4
-    head_dim: 16  # embedding dimension is n_heads * head_dim
+    head_dim: 64  # embedding dimension is n_heads * head_dim
     dropout_prob: 0
     use_bias: true
   mask:

@@ -78,9 +78,6 @@ class AlgebraicDataset(IterableDataset):
         )
         self.char_to_idx = {char: idx for idx, char in enumerate(chars)}
         self.idx_to_char = {idx: char for idx, char in enumerate(chars)}
-        print(f"{chars = }")
-        print(f"{self.char_to_idx = }")
-        print(f"{self.idx_to_char = }")
 
         # TODO: Compute correct max input and output length
         # max_atomic_length = 5  # (a+b)
@@ -93,8 +90,8 @@ class AlgebraicDataset(IterableDataset):
         self.max_output_length = (
             max_output_length if max_output_length else self._max_output_length()
         )
-        print(f"{self.max_input_length = }")
-        print(f"{self.max_output_length = }")
+
+        self.num_tokens = len(self.char_to_idx)
 
     def _max_input_length(self) -> int:
         """Computes maximum input lenght required for padding."""
@@ -160,8 +157,6 @@ class AlgebraicDataset(IterableDataset):
             if self.simplify_expression:
                 result = simplify(result)
             result = str(result).replace(" ", "")
-            print(f"{expression = }")
-            print(f"{result = }")
 
             # Add padding so that expressions and results are always of the 
             # same length.
