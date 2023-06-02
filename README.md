@@ -47,10 +47,13 @@ the networks reasoning capabilities as simplifying or solving mathematical expre
 
 ## Research Questions
 
-- Analyze loss, accuracy, entropy as a function of network parameters, activations, processed tokens, FLOPS, complexity / lenght of expressions:
+- Analyze loss, accuracy, entropy, perplexity as a function of network parameters, activations, processed tokens, FLOPS, complexity / lenght of expressions:
+- How does the network perform if it has more time to "think"?
+- How do meta layers perform?
 
 ## TODOs
 
+- Training while-loop does not work with infinite dataset -> remove.
 - Use same position and token embedding for all models. 
 - Add check so that input / output sequence does not exceed length.
 - Try to avoid padding at output for simple arithmetic problems.

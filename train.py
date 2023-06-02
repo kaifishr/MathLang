@@ -1,4 +1,5 @@
-"""Main script to run experiments."""
+"""Main script to run trainings.
+"""
 from src.config.config import init_config
 from src.dataloader import get_dataloader
 from src.modules.model import MLPMixer
@@ -41,7 +42,7 @@ def run_experiment():
     trainer = Trainer(model=model, dataloader=dataloader, config=config)
     trainer.run()
 
-    print("Experiment finished.")
+    print("Training finished.")
 
 
 if __name__ == "__main__":
