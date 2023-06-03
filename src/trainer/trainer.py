@@ -20,7 +20,7 @@ class Trainer:
 
     Attributes:
         model: PyTorch model.
-        dataloader: Tuple holding training and test dataloader.
+        dataloader: The training dataloader.
         config: Class holding configuration.
 
     Typical usage example:
@@ -59,7 +59,10 @@ class Trainer:
         # Add graph of model to Tensorboard.
         if config.summary.add_graph:
             add_graph(
-                model=model, dataloader=dataloader[0], writer=self.writer, config=config
+                model=model, 
+                dataloader=dataloader, 
+                writer=self.writer, 
+                config=config
             )
 
         learning_rate = config.trainer.learning_rate
@@ -84,50 +87,48 @@ class Trainer:
         criterion = self.criterion
         device = config.trainer.device
 
-        train_loader, test_loader = self.dataloader
-
         update_step = 0
 
-        while update_step < self.num_update_steps:
-            for x_data, y_data in train_loader:
-                # Get the inputs and labels.
-                inputs, labels = x_data.to(device), y_data.to(device)
+        for x_data, y_data in self.dataloader:
+            # Get the inputs and labels.
+            inputs, labels = x_data.to(device), y_data.to(device)
 
-                # Zero the parameter gradients.
-                optimizer.zero_grad(set_to_none=True)
+            # Zero the parameter gradients.
+            optimizer.zero_grad(set_to_none=True)
 
-                # Feedforward.
-                outputs = model(inputs)
+            # Feedforward.
+            outputs = model(inputs)
 
-                outputs = outputs.view(-1, outputs.size(-1))
-                labels = labels.view(-1)
+            outputs = outputs.view(-1, outputs.size(-1))
+            labels = labels.view(-1)
 
-                # Compute loss.
-                loss = criterion(outputs, labels)
+            # Compute loss.
+            loss = criterion(outputs, labels)
 
-                # Backpropagation
-                loss.backward()
+            # Backpropagation
+            loss.backward()
 
-                # Clip gradients
-                if config.trainer.gradient_clipping.is_activated:
-                    max_norm = config.trainer.gradient_clipping.max_norm
-                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)
+            # Clip gradients
+            if config.trainer.gradient_clipping.is_activated:
+                max_norm = config.trainer.gradient_clipping.max_norm
+                torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)
 
-                # Gradient descent
-                optimizer.step()
+            # Gradient descent
+            optimizer.step()
 
-                # keeping track of statistics
-                self.running_loss += loss.item()
-                self.running_accuracy += (
-                    (torch.argmax(outputs, dim=1) == labels).float().sum()
-                )
-                self.running_counter += labels.size(0)
+            # keeping track of statistics
+            self.running_loss += loss.item()
+            self.running_accuracy += (
+                (torch.argmax(outputs, dim=1) == labels).float().sum()
+            )
+            self.running_counter += labels.size(0)
 
-                self._train_summary(writer, update_step)
-                self._test_summary(writer, model, criterion, test_loader, update_step)
-                self._write_summary(writer=writer, model=model, update_step=update_step)
+            self._train_summary(writer=writer, update_step=update_step)
+            self._write_summary(writer=writer, model=model, update_step=update_step)
 
-                update_step += 1
+            update_step += 1
+            if update_step == self.num_update_steps:
+                break
 
         num_update_steps = config.trainer.num_update_steps
         self._write_summary(model=model, writer=writer, update_step=num_update_steps)
@@ -139,12 +140,20 @@ class Trainer:
 
         if config.summary.save_train_stats.every_n_updates > 0:
             if (update_step + 1) % config.summary.save_train_stats.every_n_updates == 0:
+
                 train_loss = self.running_loss / self.running_counter
                 train_accuracy = self.running_accuracy / self.running_counter
 
-                writer.add_scalar("train/loss", train_loss, global_step=update_step)
                 writer.add_scalar(
-                    "train/accuracy", train_accuracy, global_step=update_step
+                    "train/loss", 
+                    train_loss, 
+                    global_step=update_step
+                )
+
+                writer.add_scalar(
+                    "train/accuracy", 
+                    train_accuracy, 
+                    global_step=update_step
                 )
 
                 self.running_loss = 0.0
@@ -152,24 +161,6 @@ class Trainer:
                 self.running_counter = 0
 
                 print(f"{update_step:09d} {train_loss:.5f} {train_accuracy:.4f}")
-
-    def _test_summary(
-        self, writer, model, criterion, test_loader, update_step: int
-    ) -> None:
-        """"""
-        config = self.config
-
-        if config.summary.save_test_stats.every_n_updates > 0:
-            if (update_step + 1) % config.summary.save_test_stats.every_n_updates == 0:
-                test_loss, test_accuracy = comp_stats_classification(
-                    model=model,
-                    criterion=criterion,
-                    data_loader=test_loader,
-                )
-                writer.add_scalar("test/loss", test_loss, global_step=update_step)
-                writer.add_scalar(
-                    "test/accuracy", test_accuracy, global_step=update_step
-                )
 
     def _write_summary(self, writer, model, update_step: int) -> None:
         """"""

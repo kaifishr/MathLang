@@ -53,7 +53,6 @@ the networks reasoning capabilities as simplifying or solving mathematical expre
 
 ## TODOs
 
-- Training while-loop does not work with infinite dataset -> remove.
 - Use same position and token embedding for all models. 
 - Add check so that input / output sequence does not exceed length.
 - Try to avoid padding at output for simple arithmetic problems.

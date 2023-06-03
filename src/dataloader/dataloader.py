@@ -15,7 +15,7 @@ def seed_worker(worker_id):
     random.seed(worker_seed)
 
 
-def get_dataloader(config: Config) -> tuple[DataLoader, DataLoader]:
+def get_dataloader(config: Config) -> DataLoader:
     """Creates dataloader for specified dataset."""
 
     dataset = config.dataloader.dataset
@@ -24,11 +24,9 @@ def get_dataloader(config: Config) -> tuple[DataLoader, DataLoader]:
 
     if dataset == "arithmetic":
         train_dataset = ArithmeticDataset()
-        valid_dataset = train_dataset  # TODO: Remove.
 
     elif dataset == "algebraic":
         train_dataset = AlgebraicDataset()
-        valid_dataset = train_dataset
 
     elif dataset == "boolean":
         raise NotImplementedError(f"Dataloader for {dataset} not implemented.")
@@ -57,13 +55,4 @@ def get_dataloader(config: Config) -> tuple[DataLoader, DataLoader]:
         pin_memory=pin_memory,
     )
 
-    valid_loader = torch.utils.data.DataLoader(
-        dataset=valid_dataset,
-        batch_size=2 * batch_size,
-        num_workers=num_workers,
-        worker_init_fn=seed_worker,
-        generator=generator,
-        pin_memory=pin_memory,
-    )
-
-    return train_loader, valid_loader
+    return train_loader

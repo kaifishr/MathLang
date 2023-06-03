@@ -7,35 +7,32 @@ random_seed: 42
 dataloader:
   # "arithmetic", "algebraic", "boolean" 
   dataset: "arithmetic"
-  num_workers: 4
+  num_workers: 2
 
 #########
 # Model #
 #########
 model:
   # type: convmixer, mlpmixer, cnn, transformer
-  type: "mlpmixer"
+  type: "transformer"
   num_blocks: 2
-  # input_sequence_length: 256
   embedding_dim: 256   # For transformer: n_heads * head_dim!
   expansion_factor: 1  # only for MLP-Mixer
+  hidden_expansion: 2
   kernel_size: 3       # only for ConvMixer / CNN
-
 
 transformer:
   n_blocks: 4
   max_sequence_length: 64  # Let this be determined by dataset.
   token_embedding:
-    is_trainable: true
-    # Available encoding schemes: random_normal, sinusoidal
+    # Available encoding schemes: random_normal
     encoding: "random_normal" 
   position_embedding:
-    is_activated: true
-    is_trainable: true
     # Available encoding schemes: ones, zeros, random_normal, sinusoidal
     encoding: "zeros" 
   transformer_block:
     hidden_expansion: 2
+    # expansion_factor: 2
     dropout_prob: 0
   self_attention:
     n_heads: 4
@@ -47,27 +44,6 @@ transformer:
     is_trainable: true
     # Available masks: causal, trainable_additive, trainable_multiplicative 
     type: "trainable_additive" 
-
-
-# TODO
-__model:
-  # type: convmixer, mlpmixer, cnn, transformer
-  type: "cnn"
-  cnn:
-    num_blocks: 4
-    embedding_dim: 64
-    kernel_size: 3
-  convmixer:
-    num_blocks: 4
-    embedding_dim: 64
-    kernel_size: 3
-  mlpmixer:
-    num_blocks: 4
-    embedding_dim: 64
-    expansion_factor: 1
-  transformer:
-    num_blocks: 4
-
 
 ###########
 # Trainer #

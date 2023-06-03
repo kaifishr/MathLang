@@ -8,7 +8,6 @@ from src.modules.model import ConvModel
 from src.modules.model import Transformer
 from src.trainer.trainer import Trainer
 from src.utils.tools import set_random_seed
-# from src.utils.tools import load_checkpoint
 from src.utils.tools import count_model_parameters
 
 

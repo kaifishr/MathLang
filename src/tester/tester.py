@@ -20,7 +20,7 @@ class Tester:
 
     Attributes:
         model: PyTorch model.
-        dataloader: Tuple holding training and test dataloader.
+        dataloader: Test dataloader.
         config: Class holding configuration.
 
     """
@@ -72,12 +72,9 @@ class Tester:
         criterion = self.criterion
         device = config.trainer.device
 
-        test_loader, _ = self.dataloader
-
         num_tests = 10
 
-        for i, (x_data, y_data) in enumerate(test_loader):
-            print(i)
+        for i, (x_data, y_data) in enumerate(self.dataloader):
             # Get the inputs and labels.
             inputs, labels = x_data.to(device), y_data.to(device)
 
@@ -104,7 +101,7 @@ class Tester:
             )
 
             writer.add_scalar(
-                "train/accuracy", 
+                "test/accuracy", 
                 self.running_accuracy / self.running_counter, 
                 global_step=i
             )

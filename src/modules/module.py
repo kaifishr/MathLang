@@ -1,6 +1,4 @@
 """Common modules for neural networks."""
-import math
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -13,8 +11,9 @@ class TokenEmbedding(nn.Module):
 
     Token embedding for MLP-Mixer and convolutional neural networks.
 
-    Embeds the integer representing a character token as a vector of given dimension
-    for MLP-Mixer networks or as a square feature map for convolutional networks.
+    Embeds the integer representing a character token as a vector of given 
+    dimension for MLP-Mixer networks or as a square feature map for 
+    convolutional networks.
 
     Attributes:
         embedding_dim:
@@ -28,9 +27,9 @@ class TokenEmbedding(nn.Module):
         model_type = config.model.type
         embedding_dim = config.model.embedding_dim
 
-        if model_type == "mlpmixer":
+        if model_type in ("mlpmixer", "transformer"):
             size = (num_tokens, embedding_dim)
-        elif model_type == "convmixer" or model_type == "cnn":
+        elif model_type in ("convmixer", "cnn"):
             size = (num_tokens, embedding_dim, embedding_dim)
         else:
             raise NotImplementedError(
@@ -65,19 +64,31 @@ class PositionEmbedding(nn.Module):
         """Initializes PositionalEmbedding."""
         super().__init__()
 
-        sequence_length = config.model.input_sequence_length
         model_type = config.model.type
+        sequence_length = config.model.input_sequence_length
         embedding_dim = config.model.embedding_dim
 
-        if model_type == "mlpmixer":
+        if model_type in ("mlpmixer", "transformer"):
             size = (sequence_length, embedding_dim)
-        elif model_type == "convmixer" or model_type == "cnn":
+        elif model_type in ("convmixer", "cnn"):
             size = (sequence_length, embedding_dim, embedding_dim)
         else:
             raise NotImplementedError(
-                f"Embedding for model type {model_type} not implemented."
+                f"Embedding for model type '{model_type}' not implemented."
             )
 
+        position_embedding = config.transformer.position_embedding
+
+        if position_embedding.encoding == "zeros":
+            embedding = torch.zeros(size=size)
+        elif position_embedding.encoding == "ones":
+            embedding = torch.ones(size=size)
+        elif position_embedding.encoding == "random_normal":
+            embedding = torch.normal(mean=0.0, std=0.01, size=size)
+        else:
+            raise NotImplementedError(
+                f"Embedding '{position_embedding.encoding}' not implemented."
+            )
         embedding = torch.normal(mean=0.0, std=0.02, size=size)
         self.embedding = nn.Parameter(data=embedding, requires_grad=True)
 
@@ -406,139 +417,6 @@ class ConvClassifier(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.classifier(x)
-        return x
-
-
-class TokenEmbedding(nn.Module):
-    """Token embedding module.
-
-    Embeds an integer as a vector of defined dimension.
-
-    Attributes:
-        max_sequence_length:
-        embedding_dim:
-    """
-
-    def __init__(self, config: Config) -> None:
-        """Initializes PositionalEmbedding."""
-        super().__init__()
-
-        num_tokens = config.data.num_tokens
-
-        n_heads = config.transformer.self_attention.n_heads
-        head_dim = config.transformer.self_attention.head_dim
-        embedding_dim = n_heads * head_dim
-
-        self.cfg_token_embedding = config.transformer.token_embedding
-        size = (num_tokens, embedding_dim)
-
-        if self.cfg_token_embedding.encoding == "random_normal":
-            embedding = torch.normal(mean=0.0, std=0.01, size=size)
-        elif self.cfg_token_embedding.encoding == "sinusoidal":
-            embedding = self._sinusoidal_encoding(size=size)
-        else:
-            raise NotImplementedError(
-                f"Embedding {self.cfg_token_embedding.encoding} not implemented."
-            )
-
-        requires_grad = True if self.cfg_token_embedding.is_trainable else False
-        self.embedding = nn.Parameter(data=embedding, requires_grad=requires_grad)
-
-    @staticmethod
-    def _sinusoidal_encoding(size: tuple) -> torch.Tensor:
-        """Sinusoidal encoding scheme.
-
-        See also: https://arxiv.org/abs/1706.03762
-        """
-        num_tokens, embedding_dim = size
-        position = torch.arange(num_tokens).unsqueeze(1)
-        div_term = torch.exp(
-            torch.arange(0, embedding_dim, 2) * (-math.log(10000.0) / embedding_dim)
-        )
-        encoding = torch.zeros(num_tokens, embedding_dim)
-        encoding[:, 0::2] = torch.sin(position * div_term)
-        encoding[:, 1::2] = torch.cos(position * div_term)
-
-        return encoding
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Receives sequences of token identifiers and returns embedding.
-
-        Args:
-            x: Integer tensor holding integer token identifiers.
-
-        Returns:
-            Embedded tokens.
-        """
-        # x = self.embedding(x)  # TODO: use this later with nn.Embedding
-        x = self.embedding[x]  # TODO: Test. Seems to work as well.
-        # x = F.embedding(x, self.embedding)  # TODO: Test.
-        return x
-
-
-class PositionEmbedding(nn.Module):
-    """Positional embedding module.
-
-    Positional embedding with different encoding schemes.
-
-    Attributes:
-        max_sequence_length:
-        embedding_dim:
-    """
-
-    def __init__(self, config: Config) -> None:
-        """Initializes PositionalEmbedding."""
-        super().__init__()
-        max_sequence_length = config.transformer.max_sequence_length
-        n_heads = config.transformer.self_attention.n_heads
-        head_dim = config.transformer.self_attention.head_dim
-        embedding_dim = n_heads * head_dim
-
-        self.pos_emb = config.transformer.position_embedding
-        self.is_activated = config.transformer.position_embedding.is_activated
-
-        if self.is_activated:
-            requires_grad = True if self.pos_emb.is_trainable else False
-            size = (max_sequence_length, embedding_dim)
-
-            if self.pos_emb.encoding == "zeros":
-                embedding = torch.zeros(size=size)
-            elif self.pos_emb.encoding == "ones":
-                embedding = torch.ones(size=size)
-            elif self.pos_emb.encoding == "random_normal":
-                embedding = torch.normal(mean=0.0, std=0.01, size=size)
-            elif self.pos_emb.encoding == "sinusoidal":
-                embedding = self._sinusoidal_encoding(size=size)
-            else:
-                raise NotImplementedError(
-                    f"Embedding {self.pos_emb.encoding} not implemented."
-                )
-
-            self.embedding = nn.Parameter(data=embedding, requires_grad=requires_grad)
-
-    @staticmethod
-    def _sinusoidal_encoding(size: tuple) -> torch.Tensor:
-        """Sinusoidal encoding scheme.
-
-        See also: https://arxiv.org/abs/1706.03762
-        """
-        max_sequence_length, embedding_dim = size
-        position = torch.arange(max_sequence_length).unsqueeze(1)
-        div_term = torch.exp(
-            torch.arange(0, embedding_dim, 2) * (-math.log(10000.0) / embedding_dim)
-        )
-        encoding = torch.zeros(max_sequence_length, embedding_dim)
-        encoding[:, 0::2] = torch.sin(position * div_term)
-        encoding[:, 1::2] = torch.cos(position * div_term)
-        return encoding
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        if self.is_activated:
-            # pos = torch.arange(0, x.size(1), dtype=torch.long, device=x.device)#.unsqueeze(0)
-            # print(f"{self.embedding[pos].shape = }")
-            # print(f"{self.embedding[:x.size(1)].shape = }")
-            sequence_length = x.size(1)
-            x = x + self.embedding[:sequence_length]
         return x
 
 
