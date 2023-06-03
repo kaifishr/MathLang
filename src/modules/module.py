@@ -27,6 +27,7 @@ class TokenEmbedding(nn.Module):
         model_type = config.model.type
         embedding_dim = config.model.embedding_dim
 
+        # Get right shape for token embedding.
         if model_type in ("mlpmixer", "transformer"):
             size = (num_tokens, embedding_dim)
         elif model_type in ("convmixer", "cnn"):
@@ -77,19 +78,19 @@ class PositionEmbedding(nn.Module):
                 f"Embedding for model type '{model_type}' not implemented."
             )
 
-        position_embedding = config.transformer.position_embedding
+        position_embedding = config.model.position_embedding
 
         if position_embedding.encoding == "zeros":
             embedding = torch.zeros(size=size)
         elif position_embedding.encoding == "ones":
             embedding = torch.ones(size=size)
         elif position_embedding.encoding == "random_normal":
-            embedding = torch.normal(mean=0.0, std=0.01, size=size)
+            embedding = torch.normal(mean=0.0, std=0.02, size=size)
         else:
             raise NotImplementedError(
                 f"Embedding '{position_embedding.encoding}' not implemented."
             )
-        embedding = torch.normal(mean=0.0, std=0.02, size=size)
+
         self.embedding = nn.Parameter(data=embedding, requires_grad=True)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -124,7 +125,9 @@ class MetaLinear2(torch.nn.Module):
         hidden_features = int(hidden_expansion * in_features)
         self.w_linear = torch.nn.Sequential(
             torch.nn.Linear(
-                in_features=in_features, out_features=hidden_features, bias=bias
+                in_features=in_features, 
+                out_features=hidden_features, 
+                bias=bias
             ),
             torch.nn.Linear(
                 in_features=hidden_features,
@@ -134,10 +137,14 @@ class MetaLinear2(torch.nn.Module):
         )
         self.b_linear = torch.nn.Sequential(
             torch.nn.Linear(
-                in_features=in_features, out_features=hidden_features, bias=bias
+                in_features=in_features, 
+                out_features=hidden_features, 
+                bias=bias
             ),
             torch.nn.Linear(
-                in_features=hidden_features, out_features=out_features, bias=bias
+                in_features=hidden_features, 
+                out_features=out_features, 
+                bias=bias
             ),
         )
 
@@ -180,10 +187,14 @@ class MetaLinear(torch.nn.Module):
         self.out_features = out_features
 
         self.w_linear = torch.nn.Linear(
-            in_features=in_features, out_features=in_features * out_features, bias=bias
+            in_features=in_features, 
+            out_features=in_features * out_features, 
+            bias=bias
         )
         self.b_linear = torch.nn.Linear(
-            in_features=in_features, out_features=out_features, bias=bias
+            in_features=in_features, 
+            out_features=out_features, 
+            bias=bias
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -212,9 +223,7 @@ class MetaLinear(torch.nn.Module):
 class MlpBlock(nn.Module):
     def __init__(self, dim: int, config: Config) -> None:
         super().__init__()
-
         expansion_factor = config.model.expansion_factor
-
         hidden_dim = expansion_factor * dim
 
         self.mlp_block = nn.Sequential(
@@ -246,7 +255,6 @@ class MixerBlock(nn.Module):
 
     def __init__(self, config: Config):
         super().__init__()
-
         sequence_length = config.model.input_sequence_length
         embedding_dim = config.model.embedding_dim
 
@@ -273,7 +281,6 @@ class DepthwiseConvolution(nn.Module):
 
     def __init__(self, config: Config):
         super().__init__()
-
         sequence_length = config.model.input_sequence_length
         embedding_dim = config.model.embedding_dim
         kernel_size = config.model.kernel_size
@@ -326,7 +333,12 @@ class Convolution(nn.Module):
         kernel_size = config.model.kernel_size
 
         self.conv_block = nn.Sequential(
-            nn.Conv2d(sequence_length, sequence_length, kernel_size, padding="same"),
+            nn.Conv2d(
+                sequence_length, 
+                sequence_length, 
+                kernel_size, 
+                padding="same"
+            ),
             nn.GELU(),
             nn.LayerNorm([sequence_length, embedding_dim, embedding_dim]),
         )
@@ -358,7 +370,8 @@ class ConvMixerBlock(nn.Module):
         super().__init__()
 
         self.conv_mixer_block = nn.Sequential(
-            DepthwiseConvolution(config=config), PointwiseConvolution(config=config)
+            DepthwiseConvolution(config=config), 
+            PointwiseConvolution(config=config)
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -380,7 +393,8 @@ class Classifier(nn.Module):
             nn.LayerNorm(embedding_dim),
             SwapAxes(axis0=-2, axis1=-1),
             nn.Linear(
-                in_features=input_sequence_length, out_features=output_sequence_length
+                in_features=input_sequence_length, 
+                out_features=output_sequence_length
             ),
             SwapAxes(axis0=-2, axis1=-1),
             nn.Linear(in_features=embedding_dim, out_features=num_classes),
@@ -411,7 +425,8 @@ class ConvClassifier(nn.Module):
             ),
             nn.Flatten(start_dim=2, end_dim=-1),
             nn.Linear(
-                in_features=embedding_dim * embedding_dim, out_features=num_classes
+                in_features=embedding_dim * embedding_dim, 
+                out_features=num_classes
             ),
         )
 
@@ -431,30 +446,24 @@ class Mask(nn.Module):
         """Initializes the Mask module."""
         super().__init__()
 
-        self.cfg_mask = config.transformer.mask
-        self.is_activated = config.transformer.mask.is_activated
+        self.cfg_mask = config.model.mask
+        self.is_activated = config.model.mask.is_activated
 
         if self.is_activated:
-            self.max_sequence_length = config.transformer.max_sequence_length
+            self.max_sequence_length = config.model.input_sequence_length
+            mask_type = config.model.mask.type
             size = (self.max_sequence_length, self.max_sequence_length)
 
-            mask_type = config.transformer.mask.type
-
-            # Create masks.
             if mask_type == "trainable_additive":
-                self.mask = nn.Parameter(
-                    data=torch.zeros(size=size), requires_grad=True
-                )
+                mask_params = torch.zeros(size=size)
             elif mask_type == "trainable_multiplicative":
-                self.mask = nn.Parameter(data=torch.ones(size=size), requires_grad=True)
-            elif mask_type == "causal":
-                self.mask = nn.Parameter(
-                    data=torch.tril(input=torch.ones(size=size)),
-                    requires_grad=False,
-                )
+                mask_params = torch.ones(size=size)
             else:
-                raise NotImplementedError(f"Mask {mask_type} not implemented.")
-            # TODO: self.mask -> self.weight?
+                raise NotImplementedError(
+                    f"Mask '{mask_type}' not implemented."
+                )
+
+            self.mask = nn.Parameter(data=mask_params, requires_grad=True)
 
             self.mask_function = None
             self._install_mask(mask_type)
@@ -465,10 +474,6 @@ class Mask(nn.Module):
             self.mask_function = lambda x, seq_len: self.mask[:seq_len, :seq_len] + x
         elif mask_type == "trainable_multiplicative":
             self.mask_function = lambda x, seq_len: self.mask[:seq_len, :seq_len] * x
-        elif mask_type == "causal":
-            self.mask_function = lambda x, seq_len: x.masked_fill(
-                self.mask[:seq_len, :seq_len] == 0, float("-inf")
-            )
         else:
             raise NotImplementedError(f"Mask {mask_type} not implemented.")
 
@@ -481,6 +486,7 @@ class Mask(nn.Module):
         Returns: Masked tensor.
         """
         sequence_length = x.size(-1)
+        # sequence_length = self.max_sequence_length # TODO: Use this and simplify.
         x = self.mask_function(x, sequence_length)
         return x
 
@@ -497,32 +503,28 @@ class MultiHeadSelfAttention(nn.Module):
         """Initializes multi-head self-attention module."""
         super().__init__()
 
-        cfg = config.transformer.self_attention
+        embedding_dim = config.model.embedding_dim
+        self.num_heads = config.model.self_attention.num_heads
 
-        self.n_heads = cfg.n_heads
-        self.head_dim = cfg.head_dim
-        self.dropout_prob = cfg.dropout_prob
-        self.use_bias = cfg.use_bias
-        # self.use_mask = cfg.use_mask
+        assert embedding_dim % self.num_heads == 0
 
-        embedding_dim = cfg.n_heads * cfg.head_dim
-        bias = True if self.use_bias else False
+        self.head_dim = embedding_dim // self.num_heads
+        self.dropout_prob = config.model.dropout_prob
 
         self.comp_keys = nn.Linear(
-            in_features=embedding_dim, out_features=embedding_dim, bias=bias
+            in_features=embedding_dim, out_features=embedding_dim,
         )
         self.comp_queries = nn.Linear(
-            in_features=embedding_dim, out_features=embedding_dim, bias=bias
+            in_features=embedding_dim, out_features=embedding_dim,
         )
         self.comp_values = nn.Linear(
-            in_features=embedding_dim, out_features=embedding_dim, bias=bias
+            in_features=embedding_dim, out_features=embedding_dim,
         )
 
-        # Trainable mask. Let the network decide how the mask should look like.
         self.mask = Mask(config=config)
 
         self.linear = nn.Linear(
-            in_features=embedding_dim, out_features=embedding_dim, bias=bias
+            in_features=embedding_dim, out_features=embedding_dim,
         )
 
         self.dropout = nn.Dropout(p=self.dropout_prob)
@@ -537,9 +539,9 @@ class MultiHeadSelfAttention(nn.Module):
         values = self.comp_values(x)
 
         # Split keys, queries, and values for processing in different heads.
-        keys = keys.view(batch_size, sequence_length, self.n_heads, self.head_dim)
-        queries = queries.view(batch_size, sequence_length, self.n_heads, self.head_dim)
-        values = values.view(batch_size, sequence_length, self.n_heads, self.head_dim)
+        keys = keys.view(batch_size, sequence_length, self.num_heads, self.head_dim)
+        queries = queries.view(batch_size, sequence_length, self.num_heads, self.head_dim)
+        values = values.view(batch_size, sequence_length, self.num_heads, self.head_dim)
 
         # Scaled dot-product self-attention
         out = torch.einsum("bqhd,bkhd->bhqk", [queries, keys]) / embedding_dim**0.5
@@ -551,7 +553,7 @@ class MultiHeadSelfAttention(nn.Module):
 
         # Second part of scaled dot-product self-attention.
         out = torch.einsum("bhql,blhd->bqhd", [out, values])
-        out = out.reshape(batch_size, sequence_length, self.n_heads * self.head_dim)
+        out = out.reshape(batch_size, sequence_length, self.num_heads * self.head_dim)
 
         # Unify all heads in linear transformation.
         out = self.linear(out)
@@ -566,12 +568,9 @@ class TransformerBlock(nn.Module):
     def __init__(self, config: Config) -> None:
         super().__init__()
 
-        cfg_block = config.transformer.transformer_block
-        hidden_expansion = cfg_block.hidden_expansion
-        dropout_prob = cfg_block.dropout_prob
-
-        cfg_attention = config.transformer.self_attention
-        embedding_dim = cfg_attention.n_heads * cfg_attention.head_dim
+        embedding_dim = config.model.embedding_dim 
+        expansion_factor = config.model.expansion_factor
+        dropout_prob = config.model.dropout_prob
 
         self.attention = MultiHeadSelfAttention(config)
 
@@ -579,10 +578,10 @@ class TransformerBlock(nn.Module):
         self.layer_norm_2 = nn.LayerNorm(embedding_dim)
 
         self.mlp = nn.Sequential(
-            nn.Linear(embedding_dim, int(hidden_expansion * embedding_dim)),
+            nn.Linear(embedding_dim, int(expansion_factor * embedding_dim)),
             nn.Dropout(dropout_prob),
             nn.GELU(),
-            nn.Linear(int(hidden_expansion * embedding_dim), embedding_dim),
+            nn.Linear(int(expansion_factor * embedding_dim), embedding_dim),
             nn.Dropout(dropout_prob),
         )
 

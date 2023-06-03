@@ -23,7 +23,6 @@ class MLPMixer(nn.Module):
     def __init__(self, config: Config, num_iter: int = None):
         """Initializes MLPMixer."""
         super().__init__()
-
         self.num_iter = num_iter
         self.token_embedding = TokenEmbedding(config)
         self.position_embedding = PositionEmbedding(config)
@@ -31,7 +30,7 @@ class MLPMixer(nn.Module):
         num_blocks = config.model.num_blocks
         mixer_blocks = [MixerBlock(config) for _ in range(num_blocks)]
         self.mixer_blocks = nn.Sequential(*mixer_blocks)
-        self.classifier = Classifier(config=config)
+        self.classifier = Classifier(config)
 
         self.apply(init_weights)
 
@@ -51,14 +50,13 @@ class MLPMixer_(nn.Module):
     def __init__(self, config: Config):
         """Initializes MLPMixer."""
         super().__init__()
-
         self.token_embedding = TokenEmbedding(config)
         self.position_embedding = PositionEmbedding(config)
 
         num_blocks = config.model.num_blocks
         mixer_blocks = [MixerBlock(config) for _ in range(num_blocks)]
         self.mixer_blocks = nn.Sequential(*mixer_blocks)
-        self.classifier = Classifier(config=config)
+        self.classifier = Classifier(config)
 
         self.apply(init_weights)
 
@@ -76,14 +74,13 @@ class ConvMixer(nn.Module):
     def __init__(self, config: Config):
         """Initializes ConvMixer."""
         super().__init__()
-
         self.token_embedding = TokenEmbedding(config)
         self.position_embedding = PositionEmbedding(config)
 
         num_blocks = config.model.num_blocks
         mixer_blocks = [ConvMixerBlock(config) for _ in range(num_blocks)]
         self.mixer_blocks = nn.Sequential(*mixer_blocks)
-        self.classifier = ConvClassifier(config=config)
+        self.classifier = ConvClassifier(config)
 
         self.apply(init_weights)
 
@@ -101,14 +98,13 @@ class ConvModel(nn.Module):
     def __init__(self, config: Config):
         """Initializes convolutional neural network ."""
         super().__init__()
-
         self.token_embedding = TokenEmbedding(config)
         self.position_embedding = PositionEmbedding(config)
 
         num_blocks = config.model.num_blocks
         conv_blocks = [ConvBlock(config) for _ in range(num_blocks)]
         self.conv_blocks = nn.Sequential(*conv_blocks)
-        self.classifier = ConvClassifier(config=config)
+        self.classifier = ConvClassifier(config)
 
         self.apply(init_weights)
 
@@ -126,20 +122,17 @@ class Transformer(nn.Module):
     def __init__(self, config: Config):
         """Initializes transformer module."""
         super().__init__()
-
         self.token_embedding = TokenEmbedding(config)
         self.position_embedding = PositionEmbedding(config)
 
-        n_blocks = config.transformer.n_blocks
-        blocks = [TransformerBlock(config) for _ in range(n_blocks)]
+        num_blocks = config.model.num_blocks
+        blocks = [TransformerBlock(config) for _ in range(num_blocks)]
         self.transformer_blocks = nn.Sequential(*blocks)
-
-        self.classifier = Classifier(config=config)
+        self.classifier = Classifier(config)
 
         self.apply(init_weights)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        # TODO: Assert that maximum sequence length is not exceeded.
         x = self.token_embedding(x)
         x = self.position_embedding(x)
         x = self.transformer_blocks(x)

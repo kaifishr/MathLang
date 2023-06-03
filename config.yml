@@ -16,34 +16,21 @@ model:
   # type: convmixer, mlpmixer, cnn, transformer
   type: "transformer"
   num_blocks: 2
-  embedding_dim: 256   # For transformer: n_heads * head_dim!
-  expansion_factor: 1  # only for MLP-Mixer
-  hidden_expansion: 2
-  kernel_size: 3       # only for ConvMixer / CNN
-
-transformer:
-  n_blocks: 4
-  max_sequence_length: 64  # Let this be determined by dataset.
-  token_embedding:
-    # Available encoding schemes: random_normal
-    encoding: "random_normal" 
+  embedding_dim: 16 
+  expansion_factor: 1  # MLP-Mixer / Transformer
+  kernel_size: 3       # ConvMixer / CNN
+  dropout_prob: 0
   position_embedding:
-    # Available encoding schemes: ones, zeros, random_normal, sinusoidal
+    # Select from: ones, zeros, random_normal, sinusoidal
     encoding: "zeros" 
-  transformer_block:
-    hidden_expansion: 2
-    # expansion_factor: 2
-    dropout_prob: 0
-  self_attention:
-    n_heads: 4
-    head_dim: 64  # embedding dimension is n_heads * head_dim
-    dropout_prob: 0
-    use_bias: true
-  mask:
+  self_attention:  # Transformer only
+    num_heads: 4  # head_dim = embedding_dim // n_heads
+  mask:  # Transformer only
     is_activated: true
     is_trainable: true
-    # Available masks: causal, trainable_additive, trainable_multiplicative 
+    # Select from: trainable_additive, trainable_multiplicative 
     type: "trainable_additive" 
+
 
 ###########
 # Trainer #
@@ -53,7 +40,7 @@ trainer:
   device: "gpu"
   num_update_steps: 10000000
   batch_size: 64
-  learning_rate: 3.0e-4
+  learning_rate: 6.0e-5
   weight_decay: 0
   gradient_clipping:
     is_activated: false

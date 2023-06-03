@@ -35,7 +35,6 @@ def get_dataloader(config: Config) -> DataLoader:
 
     config.model.input_sequence_length = train_dataset.max_input_length
     config.model.output_sequence_length = train_dataset.max_output_length
-    config.data.num_classes = train_dataset.num_tokens  # TODO: Check for redundancy
     config.data.num_tokens = train_dataset.num_tokens
 
     generator = torch.Generator()
