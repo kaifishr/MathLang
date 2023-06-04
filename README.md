@@ -53,8 +53,6 @@ the networks reasoning capabilities as simplifying or solving mathematical expre
 
 ## TODOs
 
-- Use same position and token embedding for all models. 
-- Add check so that input / output sequence does not exceed length.
-- Try to avoid padding at output for simple arithmetic problems.
 - Compute correct max input and output length for padding.
+- Add check so that input / output sequence does not exceed length.
 - Adjust loss function to ignore padding at output.

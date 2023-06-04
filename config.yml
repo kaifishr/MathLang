@@ -7,16 +7,16 @@ random_seed: 42
 dataloader:
   # "arithmetic", "algebraic", "boolean" 
   dataset: "arithmetic"
-  num_workers: 2
+  num_workers: 0
 
 #########
 # Model #
 #########
 model:
   # type: convmixer, mlpmixer, cnn, transformer
-  type: "transformer"
-  num_blocks: 2
-  embedding_dim: 16 
+  type: "convmixer"
+  num_blocks: 4
+  embedding_dim: 8
   expansion_factor: 1  # MLP-Mixer / Transformer
   kernel_size: 3       # ConvMixer / CNN
   dropout_prob: 0
