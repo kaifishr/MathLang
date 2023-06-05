@@ -18,9 +18,6 @@ import torch
 from torch.utils.data.dataloader import DataLoader
 from torch.utils.data import IterableDataset
 
-torch.manual_seed(42)
-random.seed(42)
-
 
 class ArithmeticDataset(IterableDataset):
     """Creates an iterable dataset of arithmetic expressions.
@@ -28,14 +25,14 @@ class ArithmeticDataset(IterableDataset):
     Creates arithmetical problems. For example, if the following parameters
     are used:
 
-        len_expression = 4
+        num_terms = 4
         max_number = 10
 
     an example of an arithmetic expression to solve would be to
     '3+((8-9)+((9-0)+5))-(6+5)' which has the result 5.
 
     Attributes:
-        len_expression:
+        num_terms:
         max_number:
         operators:
         scalars:
@@ -46,31 +43,31 @@ class ArithmeticDataset(IterableDataset):
         max_output_length:
     """
 
-    max_number = 10
-    operator_set = "+-"
+    max_number = 9
+    operator_set = ["+", "-"]
     p_second_term = 0.5
     p_set_brackets = 0.5
     p_append_right_or_left = 0.5
 
     def __init__(
         self,
-        len_expression: int = 4,
+        num_terms: int = 4,
         max_input_length: int = None,
         max_output_length: int = None,
     ) -> None:
         """Initializes the arithmetic dataset based on provided parameters.
 
         Args:
-            len_expression: An integer defining the number of iterations to create arithmetic expression.
+            num_terms: An integer defining the number of iterations to create arithmetic expression.
             max_number: An integer defining the largest scalar value.
             operators: A string indicating which operator set to choose.
             scalars:
         """
         super().__init__()
 
-        self.len_expression = len_expression
+        self.num_terms = num_terms
         self.operators = list(self.operator_set)
-        self.scalars = list(map(str, range(self.max_number)))
+        self.scalars = list(map(str, range(self.max_number + 1)))
 
         # List of all characters used for arithmetic expressions is comprised
         # of scalar values, operators, brackets, and blank spaces for padding.
@@ -89,35 +86,41 @@ class ArithmeticDataset(IterableDataset):
 
         self.num_tokens = len(self.char_to_idx)
 
+        print(f"Maximum input sequence lenght: {self.max_input_length}")
+        print(f"Maximum output sequence lenght: {self.max_output_length}")
+
     def _max_input_length(self) -> int:
         """Computes maximum input lenght for padding.
 
-        TODO: Generalize this function to work with all operators..
+        To determine the maximum input length we assume expressions consisting
+        only of addition or multiplication operations (depending on the set of
+        operations choosen). The maximum length of a single term is five 
+        characters: (a+b)
+                    12345
 
         Returns:
             Maximum length of input.
         """
-        # Maximum length of a single term equals five characters: (a+b)
-        #                                                         12345
-        max_len_term = 5  
-        len_operator = 1
-        len_brackets = 2
-        return max_len_term + self.len_expression * (
-            max_len_term + len_operator + len_brackets
+        n_operator = 1  # Lenght of operator (+, -, *).
+        n_brackets = 2  # Lenght of opening and closing brackets.
+        n_max_term = n_brackets + n_operator + len(str(self.max_number))
+        return n_max_term + (self.num_terms - 1) * (
+            n_max_term + n_operator + n_brackets 
         )
 
     def _max_output_length(self) -> int:
         """Computes maximum output lenght for padding.
 
-        TODO: Currently, the computation only works for the +- operators set 
-        as it does not consider multiplication. Generalize for +-*.
-
         Returns:
             Maximum length of input.
         """
-        max_len_result = len(str((1 + self.len_expression) * 2 * (self.max_number - 1)))
         len_unary_opeartor = 1
-        return len_unary_opeartor + max_len_result
+        if "*" in self.operator_set:
+            max_result = self.max_number ** (2 * self.num_terms)
+        else:
+            max_result = self.num_terms * (2 * self.max_number)
+        max_result_len = len(str(max_result))
+        return len_unary_opeartor + max_result_len
 
     def _get_term(self) -> str:
         """Generates random term of random length."""
@@ -133,7 +136,7 @@ class ArithmeticDataset(IterableDataset):
         expression = collections.deque()
         expression.append(self._get_term())
 
-        for _ in range(self.len_expression):
+        for _ in range(self.num_terms - 1):
             term = self._get_term()
             operator = random.choice(self.operators)
 
@@ -158,7 +161,9 @@ class ArithmeticDataset(IterableDataset):
     def __iter__(self) -> tuple[torch.Tensor, torch.Tensor]:
         while True:
             expression = self.generate_expression()
+            print(f"{expression = }")
             result = str(eval(expression))
+            print(f"{result = }")
 
             # Add padding so that expressions and results have the same length.
             expression = expression.ljust(self.max_input_length, " ")
@@ -174,13 +179,19 @@ class ArithmeticDataset(IterableDataset):
 
 
 def main():
-    dataset = ArithmeticDataset()
+
+    torch.manual_seed(42)
+    random.seed(42)
+
+    dataset = ArithmeticDataset(
+        num_terms=2,  # TODO: Fails for num_terms=1
+    )
     dataloader = DataLoader(dataset, batch_size=2, num_workers=2)
 
     for i, (x, y) in enumerate(dataloader):
         print(f"{x = }")
         print(f"{y = }")
-        if i == 1:
+        if i == 0:
             break
 
 

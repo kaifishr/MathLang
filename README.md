@@ -8,11 +8,15 @@ This project investigates the capabilities of neural networks architectures to s
 
 An [algebraic expression](https://en.wikipedia.org/wikiAlgebraic_expression) is a [mathematical expression](https://en.wikipedia.org/wiki/Expression_(mathematics)) consisting of constants, variables, terms, and mathematical operations such as addition, subtraction, multiplication, division, and exponentiation and can look as follows:
 
-$$4 + 2*a + b*(b - 3c)$$
+$$
+4 + 2*a + b*(b - 3c)
+$$
 
 Algebraic expressions follow a well-formed **syntax**, carry **semantic meaning**, and can be understood as **stentences**. Alebraic expressions are a superset of arithmetic expressions such as:
 
-$$(4 + 2) + (1-4)*(9 - 3)$$
+$$
+(2+4)+((((3-6)-((8+1)+((6-((7-8)+6))+7-0)-(5+7)))+(1-5))-1)
+$$
 
 Algebraic expressions like the ones above provide a flexible way to manipulate and analyze mathematical **relationships**.
 
