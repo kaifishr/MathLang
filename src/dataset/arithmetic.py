@@ -51,7 +51,7 @@ class ArithmeticDataset(IterableDataset):
 
     def __init__(
         self,
-        num_terms: int = 8,
+        num_terms: int = 4,
         max_input_length: int = None,
         max_output_length: int = None,
     ) -> None:
@@ -68,7 +68,6 @@ class ArithmeticDataset(IterableDataset):
         self.num_terms = num_terms
         self.operators = list(self.operator_set)
         self.scalars = list(map(str, range(self.max_number + 1)))
-        print(f"{self.scalars = }")
 
         # List of all characters used for arithmetic expressions is comprised
         # of scalar values, operators, brackets, and blank spaces for padding.
@@ -107,9 +106,14 @@ class ArithmeticDataset(IterableDataset):
         n_operator = 1  # Lenght of operator (+, -, *).
         n_brackets = 2  # Lenght of opening and closing brackets.
         n_max_term = n_brackets + n_operator + 2 * len(str(self.max_number))
-        return n_max_term + self.num_terms * (
+        # TODO: Check again.
+        max_len_input = n_max_term + (self.num_terms - 1) * (
             n_max_term + n_operator + n_brackets 
         )
+        # max_len_input = n_max_term + self.num_terms * (
+        #     n_max_term + n_operator + n_brackets 
+        # )
+        return max_len_input
 
     def _max_output_length(self) -> int:
         """Computes maximum output lenght for padding.
