@@ -3,10 +3,10 @@ import os
 import pathlib
 
 import torch
+from torch.utils.data.dataloader import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 
 from src.config.config import Config
-from src.utils.stats import comp_stats_classification
 from src.summary.summary import add_graph
 from src.summary.summary import add_token_embedding_weights
 from src.summary.summary import add_position_embedding_weights
@@ -32,7 +32,10 @@ class Trainer:
     """
 
     def __init__(
-        self, model: torch.nn.Module, dataloader: tuple, config: Config
+        self, 
+        model: torch.nn.Module, 
+        dataloader: DataLoader, 
+        config: Config
     ) -> None:
         """Initializes Trainer."""
         self.model = model
@@ -71,7 +74,11 @@ class Trainer:
             model.parameters(), lr=learning_rate, weight_decay=weight_decay
         )
 
-        self.criterion = torch.nn.CrossEntropyLoss()
+        # Get index of padding token.
+        ignore_index = self.dataloader.dataset.char_to_idx[" "]
+        self.criterion = torch.nn.CrossEntropyLoss(
+            ignore_index=ignore_index
+        )
 
         self.running_loss = 0.0
         self.running_accuracy = 0.0

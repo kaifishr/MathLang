@@ -51,7 +51,7 @@ class ArithmeticDataset(IterableDataset):
 
     def __init__(
         self,
-        num_terms: int = 4,
+        num_terms: int = 8,
         max_input_length: int = None,
         max_output_length: int = None,
     ) -> None:
@@ -76,6 +76,7 @@ class ArithmeticDataset(IterableDataset):
         # Lookup table for character-index-translation.
         self.char_to_idx = {char: idx for idx, char in enumerate(chars)}
         self.idx_to_char = {idx: char for idx, char in enumerate(chars)}
+        print(f"{self.char_to_idx}")
 
         self.max_input_length = (
             max_input_length if max_input_length else self._max_input_length()
@@ -104,7 +105,7 @@ class ArithmeticDataset(IterableDataset):
         n_operator = 1  # Lenght of operator (+, -, *).
         n_brackets = 2  # Lenght of opening and closing brackets.
         n_max_term = n_brackets + n_operator + len(str(self.max_number))
-        return n_max_term + (self.num_terms - 1) * (
+        return n_max_term + self.num_terms * (
             n_max_term + n_operator + n_brackets 
         )
 
@@ -161,9 +162,7 @@ class ArithmeticDataset(IterableDataset):
     def __iter__(self) -> tuple[torch.Tensor, torch.Tensor]:
         while True:
             expression = self.generate_expression()
-            print(f"{expression = }")
             result = str(eval(expression))
-            print(f"{result = }")
 
             # Add padding so that expressions and results have the same length.
             expression = expression.ljust(self.max_input_length, " ")
@@ -184,14 +183,14 @@ def main():
     random.seed(42)
 
     dataset = ArithmeticDataset(
-        num_terms=2,  # TODO: Fails for num_terms=1
+        num_terms=1,
     )
     dataloader = DataLoader(dataset, batch_size=2, num_workers=2)
 
     for i, (x, y) in enumerate(dataloader):
-        print(f"{x = }")
+        print(f"{x.shape = }")
         print(f"{y = }")
-        if i == 0:
+        if i == 2:
             break
 
 

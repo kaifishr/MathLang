@@ -14,8 +14,8 @@ dataloader:
 #########
 model:
   # type: convmixer, mlpmixer, cnn, transformer
-  type: "convmixer"
-  num_blocks: 4
+  type: "mlpmixer"
+  num_blocks: 2
   embedding_dim: 8
   expansion_factor: 1  # MLP-Mixer / Transformer
   kernel_size: 3       # ConvMixer / CNN
@@ -39,7 +39,7 @@ trainer:
   # gpu, cpu
   device: "gpu"
   num_update_steps: 10000000
-  batch_size: 64
+  batch_size: 4
   learning_rate: 6.0e-5
   weight_decay: 0
   gradient_clipping:
