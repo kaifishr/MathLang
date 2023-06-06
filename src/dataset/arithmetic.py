@@ -76,7 +76,6 @@ class ArithmeticDataset(IterableDataset):
         # Lookup table for character-index-translation.
         self.char_to_idx = {char: idx for idx, char in enumerate(chars)}
         self.idx_to_char = {idx: char for idx, char in enumerate(chars)}
-        print(f"{self.char_to_idx}")
 
         self.max_input_length = (
             max_input_length if max_input_length else self._max_input_length()
