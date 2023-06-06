@@ -16,7 +16,7 @@ model:
   # type: convmixer, mlpmixer, cnn, transformer
   type: "mlpmixer"
   num_blocks: 8
-  embedding_dim: 8
+  embedding_dim: 16
   expansion_factor: 1  # MLP-Mixer / Transformer
   kernel_size: 3       # ConvMixer / CNN
   dropout_prob: 0

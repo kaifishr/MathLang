@@ -68,6 +68,7 @@ class ArithmeticDataset(IterableDataset):
         self.num_terms = num_terms
         self.operators = list(self.operator_set)
         self.scalars = list(map(str, range(self.max_number + 1)))
+        print(f"{self.scalars = }")
 
         # List of all characters used for arithmetic expressions is comprised
         # of scalar values, operators, brackets, and blank spaces for padding.
@@ -94,7 +95,9 @@ class ArithmeticDataset(IterableDataset):
 
         To determine the maximum input length we assume expressions consisting
         only of addition or multiplication operations (depending on the set of
-        operations choosen). The maximum length of a single term is five 
+        operations choosen). 
+        
+        For scalars 0 to 9, the maximum length of a single term is five 
         characters: (a+b)
                     12345
 
@@ -103,7 +106,7 @@ class ArithmeticDataset(IterableDataset):
         """
         n_operator = 1  # Lenght of operator (+, -, *).
         n_brackets = 2  # Lenght of opening and closing brackets.
-        n_max_term = n_brackets + n_operator + len(str(self.max_number))
+        n_max_term = n_brackets + n_operator + 2 * len(str(self.max_number))
         return n_max_term + self.num_terms * (
             n_max_term + n_operator + n_brackets 
         )
