@@ -169,6 +169,8 @@ class ArithmeticDataset(IterableDataset):
         while True:
             expression = self.generate_expression()
             result = str(eval(expression))
+            print(f"{expression = }")
+            print(f"{result = }")
 
             # Add padding so that expressions and results have the same length.
             expression = expression.ljust(self.max_input_length, " ")
@@ -189,7 +191,7 @@ def main():
     random.seed(42)
 
     dataset = ArithmeticDataset(
-        num_terms=1,
+        num_terms=8,
     )
     dataloader = DataLoader(dataset, batch_size=2, num_workers=2)
 

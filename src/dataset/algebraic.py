@@ -21,9 +21,6 @@ from torch.utils.data import IterableDataset
 from sympy.parsing.sympy_parser import parse_expr
 from sympy import simplify
 
-torch.manual_seed(42)
-random.seed(42)
-
 
 class AlgebraicDataset(IterableDataset):
     """Creates an iterable dataset of algebraic expressions.
@@ -61,12 +58,12 @@ class AlgebraicDataset(IterableDataset):
 
     def __init__(
         self,
-        len_expression: int = 4,
+        num_terms: int = 4,
         simplify_expression: bool = True,
         max_input_length: int = 64,
         max_output_length: int = 16,
     ) -> None:
-        self.len_expression = len_expression  # TODO: Find better name for variable.
+        self.num_terms = num_terms  # TODO: Find better name for variable.
         self.simplify_expression = simplify_expression
 
         self.operators = list(self.operator_set)
@@ -83,7 +80,7 @@ class AlgebraicDataset(IterableDataset):
         # max_atomic_length = 5  # (a+b)
         #                          ^^^^^
         #                          12345
-        # self.max_input_length = self.len_expression * max_atomic_length
+        # self.max_input_length = self.num_terms * max_atomic_length
         self.max_input_length = (
             max_input_length if max_input_length else self._max_input_length()
         )
@@ -128,7 +125,7 @@ class AlgebraicDataset(IterableDataset):
         # Append initial term.
         expression.append(self._get_term())
 
-        for _ in range(self.len_expression):
+        for _ in range(self.num_terms):
             term = self._get_term()
             operator = random.choice(self.operators)
 
@@ -174,12 +171,17 @@ class AlgebraicDataset(IterableDataset):
 
 def main():
 
-    dataset = AlgebraicDataset()
+    torch.manual_seed(42)
+    random.seed(42)
+
+    dataset = AlgebraicDataset(
+        num_terms=8
+    )
     dataloader = DataLoader(dataset, batch_size=2, num_workers=2)
     for i, (x, y) in enumerate(dataloader):
         print(f"{x = }")
         print(f"{y = }")
-        if i == 1:
+        if i == 3:
             break
 
 

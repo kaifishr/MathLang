@@ -292,9 +292,10 @@ class DepthwiseConvolution(nn.Module):
                 kernel_size,
                 groups=sequence_length,
                 padding="same",
+                bias=False
             ),
-            nn.GELU(),
             nn.LayerNorm([sequence_length, embedding_dim, embedding_dim]),
+            nn.GELU(),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -312,9 +313,13 @@ class PointwiseConvolution(nn.Module):
         embedding_dim = config.model.embedding_dim
 
         self.pointwise_conv = nn.Sequential(
-            nn.Conv2d(sequence_length, sequence_length, kernel_size=1),
-            nn.GELU(),
+            nn.Conv2d(
+                sequence_length, 
+                sequence_length, 
+                kernel_size=1,
+                bias=False),
             nn.LayerNorm([sequence_length, embedding_dim, embedding_dim]),
+            nn.GELU(),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -337,10 +342,11 @@ class Convolution(nn.Module):
                 sequence_length, 
                 sequence_length, 
                 kernel_size, 
-                padding="same"
+                padding="same",
+                bias=False
             ),
-            nn.GELU(),
             nn.LayerNorm([sequence_length, embedding_dim, embedding_dim]),
+            nn.GELU(),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:

@@ -4,18 +4,26 @@ Solving arithmetic expressions or simplifying complex algebraic expressions by e
 
 This project investigates the capabilities of neural networks architectures to solve math problems and possible applications of pre-training on mathematical expressions for natural language processing and to test and predict network capabilities. Due to the interesting properties of mathematical expressions of arbitrary complexity, this project is potentially interesting to test neural network architectures designed for natural language processing.
 
+## Motivation
+
+Mathematical expressions can have long-range dependencies (brackets determine which terms are processed first).
+
 ## Algebraic Expressions and Sentences
 
 An [algebraic expression](https://en.wikipedia.org/wikiAlgebraic_expression) is a [mathematical expression](https://en.wikipedia.org/wiki/Expression_(mathematics)) consisting of constants, variables, terms, and mathematical operations such as addition, subtraction, multiplication, division, and exponentiation and can look as follows:
 
 $$
-4 + 2*a + b*(b - 3c)
+((3*x-6*z)-((x-1)-((1*y-(((7+x)+(8-z))-5*y))+1)-z))
+=
+x+6*y-4*z-13
 $$
 
 Algebraic expressions follow a well-formed **syntax**, carry **semantic meaning**, and can be understood as **stentences**. Alebraic expressions are a superset of arithmetic expressions such as:
 
 $$
-(2+4)+((((3-6)-((8+1)+((6-((7-8)+6))+7-0)-(5+7)))+(1-5))-1)
+3+6-(1+3)+((8-3)+((7-9)-(9+0)-(6+2))+(1-6))
+=
+-14
 $$
 
 Algebraic expressions like the ones above provide a flexible way to manipulate and analyze mathematical **relationships**.
@@ -53,10 +61,14 @@ the networks reasoning capabilities as simplifying or solving mathematical expre
 
 - Analyze loss, accuracy, entropy, perplexity as a function of network parameters, activations, processed tokens, FLOPS, complexity / lenght of expressions:
 - How does the network perform if it has more time to "think"?
+    - Is it possible to "simulate" bigger
 - How do meta layers perform?
 
 ## TODOs
 
+- Add extra folder with projects
+    - calculator
+    - experiments ...
 - Compute correct max input and output length for padding.
 - Add check so that input / output sequence does not exceed length.
 - Adjust loss function to ignore padding at output.
