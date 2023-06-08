@@ -169,8 +169,6 @@ class ArithmeticDataset(IterableDataset):
         while True:
             expression = self.generate_expression()
             result = str(eval(expression))
-            print(f"{expression = }")
-            print(f"{result = }")
 
             # Add padding so that expressions and results have the same length.
             expression = expression.ljust(self.max_input_length, " ")

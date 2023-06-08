@@ -17,20 +17,20 @@ model:
   # type: convmixer, mlpmixer, cnn, transformer
   type: "mlpmixer"
   num_blocks: 4
-  embedding_dim: 64
+  embedding_dim: 16
   expansion_factor: 1  # MLP-Mixer / Transformer
   kernel_size: 3       # ConvMixer / CNN
   dropout_prob: 0
   position_embedding:
     # Select from: ones, zeros, random_normal, sinusoidal
-    encoding: "zeros" 
+    encoding: "ones" 
   self_attention:  # Transformer only
     num_heads: 4  # head_dim = embedding_dim // n_heads
   mask:  # Transformer only
     is_activated: true
     is_trainable: true
     # Select from: trainable_additive, trainable_multiplicative 
-    type: "trainable_additive" 
+    type: "trainable_multiplicative" 
 
 
 ###########
