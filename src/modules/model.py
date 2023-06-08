@@ -37,10 +37,11 @@ class MLPMixer(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.token_embedding(x)
         x = self.position_embedding(x)
-        num_iter = self.num_iter or random.randint(1, 8)
-        # counter = torch.linspace(1.0, 0.0, num_iter, requires_grad=False)
+        num_iter = self.num_iter or random.randint(4, 16)
+        counter = torch.linspace(1.0, 0.0, num_iter)
+        # x[:, 1, 1] = num_iter
         for i in range(num_iter):
-            # x[:, 0, 0] = counter[i]
+            x[:, 0, 0] = counter[i]
             x = self.mixer_blocks(x)
         x = self.classifier(x)
         return x

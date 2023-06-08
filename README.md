@@ -6,7 +6,7 @@ This project investigates the capabilities of neural networks architectures to s
 
 ## Motivation
 
-Mathematical expressions can have long-range dependencies (brackets determine which terms are processed first).
+Mathematical expressions can have long-range dependencies (brackets determine which terms are processed first). This can be used to train a network to learn relations over long sequences.
 
 ## Algebraic Expressions and Sentences
 
@@ -61,7 +61,7 @@ the networks reasoning capabilities as simplifying or solving mathematical expre
 
 - Analyze loss, accuracy, entropy, perplexity as a function of network parameters, activations, processed tokens, FLOPS, complexity / lenght of expressions:
 - How does the network perform if it has more time to "think"?
-    - Is it possible to "simulate" bigger
+    - Is it possible to "simulate" big networks.
 - How do meta layers perform?
 
 ## TODOs
