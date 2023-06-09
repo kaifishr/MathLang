@@ -98,14 +98,74 @@ class PositionEmbedding(nn.Module):
         return x
 
 
+class MetaLinear3(torch.nn.Module):
+    """Linear meta layer.
+
+    Meta layers compute weight matrix for their linear transformation
+    dynamically based on the input tensor `x`. To reduce computational costs, 
+    this version of MetaLayer computes two vectors based on the input that are 
+    then used to compute an outer product representing the weight matrix.
+    """
+
+    def __init__(self, in_features: int, out_features: int, bias: bool = False):
+        """Initializes a meta layer instance."""
+        super().__init__()
+
+        self.in_features = in_features
+        self.out_features = out_features
+
+        self.linear_in = torch.nn.Linear(
+            in_features=in_features, 
+            out_features=in_features, 
+            bias=bias
+        )
+        
+        self.linear_out = torch.nn.Linear(
+            in_features=in_features, 
+            out_features=out_features, 
+            bias=bias
+        )
+
+        self.linear_b = torch.nn.Linear(
+            in_features=in_features, 
+            out_features=out_features, 
+            bias=bias
+        )
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        batch_size, seq_len, embed_dim = x.size()
+
+        # Compute weights of weight matrix conditioned on input `x`.
+
+        # 1) Compute weight vectors.
+        w_1 = self.linear_in(x)
+        w_2 = self.linear_out(x)
+
+        # 2) Compute weight matrix as result of an outer product.
+        w = torch.einsum("bsi,bsj->bsij", w_2, w_1)
+        w = w.reshape(batch_size * seq_len, self.out_features, self.in_features)
+
+        # 3) Compute bias weights.
+        b = self.linear_b(x)
+        b = b.reshape(batch_size * seq_len, self.out_features, 1)
+
+        # 4) Reshape input for matrix multiplication by folding sequence 
+        # dimensions into batch dimension and by adding additional dimension.
+        x = x.reshape(batch_size * seq_len, embed_dim, 1)
+
+        # 5) Transform input `x` using the dynamically computes weight matrix.
+        x = torch.bmm(w, x) + b
+        x = x.reshape(batch_size, seq_len, self.out_features)
+
+        return x
+
+
 class MetaLinear2(torch.nn.Module):
     """Meta linear layer class.
 
-    The meta linear layer computes a weight matrices and biases
-    based on the input with which the linear transformation
-    then is performed.
-
-    This layer first reduces the size of the input features before
+    This meta linear layer computes a weight matrices and biases based on the 
+    input with which the linear transformation then is performed. To improve
+    performance, the layer first reduces the size of the input features before 
     computing the weight matrices.
     """
 
@@ -227,7 +287,7 @@ class MlpBlock(nn.Module):
         hidden_dim = expansion_factor * dim
 
         self.mlp_block = nn.Sequential(
-            # MetaLinear(in_features=dim, out_features=hidden_dim),
+            MetaLinear3(in_features=dim, out_features=hidden_dim),
             # MetaLinear(in_features=hidden_dim, out_features=dim),
             nn.Linear(in_features=dim, out_features=hidden_dim),
             nn.Linear(in_features=hidden_dim, out_features=dim),
