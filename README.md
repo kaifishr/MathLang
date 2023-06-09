@@ -1,31 +1,31 @@
 # MathNet
 
-Solving arithmetic expressions or simplifying complex algebraic expressions by expressing them in a more concise and manageable form requires a network to follow a certain set of rules and techniques that have to be learned during training and requires some form of reasoning capabilities.
+Mathematical expressions, such as arithmetic or algebraic ones, can be generated at low cost and with arbitraty complexity, yet come with short- and long-range dependencies (brackets determine processing order of terms) and other interesting properties that can be used to train a network to learn relations between tokens over long sequences.
 
-This project investigates the capabilities of neural networks architectures to solve math problems and possible applications of pre-training on mathematical expressions for natural language processing and to test and predict network capabilities. Due to the interesting properties of mathematical expressions of arbitrary complexity, this project is potentially interesting to test neural network architectures designed for natural language processing.
+Solving arithmetic expressions or simplifying complex algebraic expressions by expressing them in a more concise and manageable form requires to follow a certain set of rules and techniques that have to be learned during training and requires some form of reasoning capabilities.
 
-## Motivation
+This project investigates the capabilities of neural networks architectures to solve math problems and possible applications of pre-training on mathematical expressions for language models. 
 
-Mathematical expressions can have long-range dependencies (brackets determine which terms are processed first). This can be used to train a network to learn relations over long sequences.
+## Algebraic Expressions and Sentences 
 
-## Algebraic Expressions and Sentences
-
-An [algebraic expression](https://en.wikipedia.org/wikiAlgebraic_expression) is a [mathematical expression](https://en.wikipedia.org/wiki/Expression_(mathematics)) consisting of constants, variables, terms, and mathematical operations such as addition, subtraction, multiplication, division, and exponentiation and can look as follows:
+An [algebraic expression](https://en.wikipedia.org/wikiAlgebraic_expression) is a [mathematical expression](https://en.wikipedia.org/wiki/Expression_(mathematics)) that follows a well-formed **syntax**, carries **semantic meaning**, and 
+consisting of constants, variables, terms, and mathematical operations such as addition, subtraction, multiplication, division, and exponentiation and can look as follows:
 
 $$
-((3*x-6*z)-((x-1)-((1*y-(((7+x)+(8-z))-5*y))+1)-z))
-=
-x+6*y-4*z-13
+((3 \cdot x-6 \cdot z)-((x-1)-((1 \cdot y-(((7+x)+(8-z))-5 \cdot y))+1)-z))
 $$
 
-Algebraic expressions follow a well-formed **syntax**, carry **semantic meaning**, and can be understood as **stentences**. Alebraic expressions are a superset of arithmetic expressions such as:
+For the expresion above, the network's task would be to compute a simplified version of the expression that is $x+6*y-4*z-13$. The simplification is performed using *SymPy*'s `simplify()` method that also sorts the variables and add the scalar term at the end of the expression.
+
+Alebraic expressions are a superset of arithmetic expressions such as:
 
 $$
 3+6-(1+3)+((8-3)+((7-9)-(9+0)-(6+2))+(1-6))
-=
--14
 $$
 
+In this case, the network's task would be to compute the scalar result $-14$.
+
+# CONTINUE
 Algebraic expressions like the ones above provide a flexible way to manipulate and analyze mathematical **relationships**.
 
 Algebraic expressions and sentences, like this one, share certain structural characteristics and the goal of conveying meaning.
@@ -71,4 +71,3 @@ the networks reasoning capabilities as simplifying or solving mathematical expre
     - experiments ...
 - Compute correct max input and output length for padding.
 - Add check so that input / output sequence does not exceed length.
-- Adjust loss function to ignore padding at output.
