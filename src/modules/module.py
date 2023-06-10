@@ -354,7 +354,6 @@ class DepthwiseConvolution(nn.Module):
                 kernel_size,
                 groups=sequence_length,
                 padding="same",
-                bias=False
             ),
             nn.LayerNorm([sequence_length, embedding_dim, embedding_dim]),
             nn.GELU(),
@@ -378,8 +377,8 @@ class PointwiseConvolution(nn.Module):
             nn.Conv2d(
                 sequence_length, 
                 sequence_length, 
-                kernel_size=1,
-                bias=False),
+                kernel_size=1
+            ),
             nn.LayerNorm([sequence_length, embedding_dim, embedding_dim]),
             nn.GELU(),
         )
@@ -405,7 +404,6 @@ class Convolution(nn.Module):
                 sequence_length, 
                 kernel_size, 
                 padding="same",
-                bias=False
             ),
             nn.LayerNorm([sequence_length, embedding_dim, embedding_dim]),
             nn.GELU(),

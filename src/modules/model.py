@@ -17,7 +17,7 @@ from src.utils.tools import init_weights
 
 
 import random
-class MLPMixer(nn.Module):
+class MLPMixer_(nn.Module):
     """Character-level isotropic MLP-Mixer."""
 
     def __init__(self, config: Config, num_iter: int = None):
@@ -47,7 +47,7 @@ class MLPMixer(nn.Module):
         return x
 
 
-class MLPMixer_(nn.Module):
+class MLPMixer(nn.Module):
     """Character-level isotropic MLP-Mixer."""
 
     def __init__(self, config: Config):

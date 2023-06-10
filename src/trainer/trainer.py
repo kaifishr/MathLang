@@ -75,9 +75,9 @@ class Trainer:
         )
 
         # Get index of padding token.
-        ignore_index = self.dataloader.dataset.char_to_idx[" "]
+        self.ignore_index = self.dataloader.dataset.char_to_idx[" "]
         self.criterion = torch.nn.CrossEntropyLoss(
-            ignore_index=ignore_index
+            ignore_index=self.ignore_index
         )
 
         self.running_loss = 0.0
@@ -112,21 +112,22 @@ class Trainer:
             # Compute loss.
             loss = criterion(outputs, labels)
 
-            # Backpropagation
+            # Backpropagation.
             loss.backward()
 
-            # Clip gradients
+            # Clip gradients.
             if config.trainer.gradient_clipping.is_activated:
                 max_norm = config.trainer.gradient_clipping.max_norm
                 torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm)
 
-            # Gradient descent
+            # Gradient descent.
             optimizer.step()
 
-            # keeping track of statistics
+            # Keeping track of statistics.
             self.running_loss += loss.item()
+            mask = torch.where(labels != self.ignore_index, 1, 0)
             self.running_accuracy += (
-                (torch.argmax(outputs, dim=1) == labels).float().sum()
+                (mask*(torch.argmax(outputs, dim=1) == labels)).float().sum()
             )
             self.running_counter += labels.size(0)
 
