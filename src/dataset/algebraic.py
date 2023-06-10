@@ -86,8 +86,6 @@ class AlgebraicDataset(IterableDataset):
         self.max_input_length = self._comp_max_input_length()
         self.max_output_length = self._comp_max_output_length()
 
-        self.max_len = 0
-
     def _comp_max_input_length(self) -> int:
         """Computes maximum input lenght for padding.
 
@@ -193,10 +191,6 @@ class AlgebraicDataset(IterableDataset):
                 result = simplify(result)
             result = str(result).replace(" ", "")
 
-            if len(result) > self.max_len:
-                self.max_len = len(result)
-                print(self.max_len)
-
             # Add padding so that expressions and results are always of the 
             # same length.
             expression = expression.ljust(self.max_input_length, " ")
@@ -221,11 +215,10 @@ def main():
     )
     dataloader = DataLoader(dataset, batch_size=2, num_workers=2)
     for i, (x, y) in enumerate(dataloader):
-        pass
-        # print(f"{x = }")
-        # print(f"{y = }")
-        # if i == 3:
-        #     break
+        print(f"{x = }")
+        print(f"{y = }")
+        if i == 3:
+            break
 
 if __name__ == "__main__":
     main()

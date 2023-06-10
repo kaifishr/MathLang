@@ -129,7 +129,7 @@ class Trainer:
             self.running_accuracy += (
                 (mask*(torch.argmax(outputs, dim=1) == labels)).float().sum()
             )
-            self.running_counter += labels.size(0)
+            self.running_counter += labels.size(0)  # TODO: mask.sum()
 
             self._train_summary(writer=writer, update_step=update_step)
             self._write_summary(writer=writer, model=model, update_step=update_step)
