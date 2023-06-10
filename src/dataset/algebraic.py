@@ -59,8 +59,7 @@ class AlgebraicDataset(IterableDataset):
     def __init__(
         self,
         num_terms: int = 4,
-        use_simplify: bool = True,
-        max_output_length: int = 16,
+        use_simplify: bool = False,
     ) -> None:
         """Initializes an insance of AlgebraicDataset.
         """
@@ -85,9 +84,9 @@ class AlgebraicDataset(IterableDataset):
         self.num_tokens = len(self.char_to_idx)
 
         self.max_input_length = self._comp_max_input_length()
-        self.max_output_length = (
-            max_output_length if max_output_length else self._comp_max_output_length()
-        )
+        self.max_output_length = self._comp_max_output_length()
+
+        self.max_len = 0
 
     def _comp_max_input_length(self) -> int:
         """Computes maximum input lenght for padding.
@@ -96,24 +95,46 @@ class AlgebraicDataset(IterableDataset):
         only of addition or multiplication operations (depending on the set of
         operations choosen). 
         
-        For scalars 0 to 9, the maximum length of a single term is five 
-        characters: (2a+3b)
-                    1234567
+        For scalars 0 to 9, and variables [a, b], the maximum length of an
+        atomic term is nine characters: (2*a+3*b)
+                                        123456789
 
         Returns:
-            Maximum length of input.
+            Integer representing maximum length of input sequence.
         """
-        n_operator = 1  # Lenght of operator (+, -, *).
-        n_brackets = 2  # Lenght of opening and closing brackets.
-        n_max_term = n_brackets + n_operator + 2 * len(str(self.max_number))
+
+        # Compute maximum length of atomic term
+
+        # Total lenght of opening and closing brackets.
+        n_brackets = 2
+        # Total length of operators.
+        n_operators = 3
+        # Total lenght of single characer variables.
+        n_variables = 2
+        # Total length of characters used to display scalars.
+        n_scalars = 2 * len(str(self.max_number))
+
+        n_max_term = n_brackets + n_operators + n_variables + n_scalars
+
+        # Operators used to concatenate terms.
+        n_concat_operators = 1
+
         max_len_input = n_max_term + (self.num_terms - 1) * (
-            n_max_term + n_operator + n_brackets 
+            n_max_term + n_concat_operators + n_brackets 
         )
         return max_len_input
 
-    def _max_output_length(self) -> int:
-        """Computes maximum output lenght required for padding."""
-        raise NotImplementedError
+    def _comp_max_output_length(self) -> int:
+        """Computes maximum output lenght required for padding.
+        
+        Ok, here we are lazy because the weather is good and we want to go
+        outside. We just assume that the simplified output is never longer 
+        than the input.
+
+        Returns:
+            Integer representing maximum length of output sequence.
+        """
+        return self._comp_max_input_length()
 
     def generate_term(self) -> str:  # TODO: use better function names.
         """Generates random term."""
@@ -172,6 +193,10 @@ class AlgebraicDataset(IterableDataset):
                 result = simplify(result)
             result = str(result).replace(" ", "")
 
+            if len(result) > self.max_len:
+                self.max_len = len(result)
+                print(self.max_len)
+
             # Add padding so that expressions and results are always of the 
             # same length.
             expression = expression.ljust(self.max_input_length, " ")
@@ -196,11 +221,11 @@ def main():
     )
     dataloader = DataLoader(dataset, batch_size=2, num_workers=2)
     for i, (x, y) in enumerate(dataloader):
-        print(f"{x = }")
-        print(f"{y = }")
-        if i == 3:
-            break
-
+        pass
+        # print(f"{x = }")
+        # print(f"{y = }")
+        # if i == 3:
+        #     break
 
 if __name__ == "__main__":
     main()

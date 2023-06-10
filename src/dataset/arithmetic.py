@@ -94,16 +94,17 @@ class ArithmeticDataset(IterableDataset):
         Returns:
             Maximum length of input.
         """
-        n_operator = 1  # Lenght of operator (+, -, *).
-        n_brackets = 2  # Lenght of opening and closing brackets.
-        n_max_term = n_brackets + n_operator + 2 * len(str(self.max_number))
-        # TODO: Check again.
+        # Total lenght of opening and closing brackets.
+        n_brackets = 2
+        # Total length of operators.
+        n_operator = 1
+        # Total length of characters used to display scalars.
+        n_scalars = 2 * len(str(self.max_number))
+
+        n_max_term = n_brackets + n_operator + n_scalars 
         max_len_input = n_max_term + (self.num_terms - 1) * (
             n_max_term + n_operator + n_brackets 
         )
-        # max_len_input = n_max_term + self.num_terms * (
-        #     n_max_term + n_operator + n_brackets 
-        # )
         return max_len_input
 
     def _comp_max_output_length(self) -> int:
