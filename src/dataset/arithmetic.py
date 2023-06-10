@@ -1,15 +1,14 @@
 """Arithmetic dataset.
 
-Generates arithmetic sequences and their solution using Python's 
-'eval()' method.
+Generates arithmetic sequences and their solution using Python's `eval()`
+method.
 
 Typical usage example:
 
     dataset = ArithmeticDataset()
     dataloader = DataLoader(dataset, batch_size=2, num_workers=2)
     for x, y in dataloader:
-        print(f"{x = }")
-        print(f"{y = }")
+        pass  # Do stuff with `x` and `y`.
 """
 import collections
 import random
@@ -45,6 +44,8 @@ class ArithmeticDataset(IterableDataset):
 
     max_number = 9
     operator_set = ["+", "-"]
+
+    # These probabilities determine properties of expressions.
     p_second_term = 0.5
     p_set_brackets = 0.5
     p_append_right_or_left = 0.5
@@ -52,16 +53,11 @@ class ArithmeticDataset(IterableDataset):
     def __init__(
         self,
         num_terms: int = 4,
-        max_input_length: int = None,
-        max_output_length: int = None,
     ) -> None:
         """Initializes the arithmetic dataset based on provided parameters.
 
         Args:
             num_terms: An integer defining the number of iterations to create arithmetic expression.
-            max_number: An integer defining the largest scalar value.
-            operators: A string indicating which operator set to choose.
-            scalars:
         """
         super().__init__()
 
@@ -76,20 +72,15 @@ class ArithmeticDataset(IterableDataset):
         # Lookup table for character-index-translation.
         self.char_to_idx = {char: idx for idx, char in enumerate(chars)}
         self.idx_to_char = {idx: char for idx, char in enumerate(chars)}
-
-        self.max_input_length = (
-            max_input_length if max_input_length else self._max_input_length()
-        )
-        self.max_output_length = (
-            max_output_length if max_output_length else self._max_output_length()
-        )
-
         self.num_tokens = len(self.char_to_idx)
+
+        self.max_input_length = self._comp_max_input_length()
+        self.max_output_length = self._comp_max_output_length()
 
         print(f"Maximum input sequence lenght: {self.max_input_length}")
         print(f"Maximum output sequence lenght: {self.max_output_length}")
 
-    def _max_input_length(self) -> int:
+    def _comp_max_input_length(self) -> int:
         """Computes maximum input lenght for padding.
 
         To determine the maximum input length we assume expressions consisting
@@ -115,7 +106,7 @@ class ArithmeticDataset(IterableDataset):
         # )
         return max_len_input
 
-    def _max_output_length(self) -> int:
+    def _comp_max_output_length(self) -> int:
         """Computes maximum output lenght for padding.
 
         Returns:

@@ -8,8 +8,7 @@ Typical usage example:
     dataset = AlgebraicDataset()
     dataloader = DataLoader(dataset, batch_size=2, num_workers=2)
     for x, y in dataloader:
-        print(f"{x = }")
-        print(f"{y = }")
+        pass  # Do stuff with `x` and `y`.
 """
 import collections
 import random
@@ -25,20 +24,19 @@ from sympy import simplify
 class AlgebraicDataset(IterableDataset):
     """Creates an iterable dataset of algebraic expressions.
 
-    Creates arithmetical problems. For example, if the following parameters
-    are used:
+    Creates algebraic expressions. For example, if the following parameters are 
+    used:
 
-        len_expression = 4
+        num_terms = 4
         max_number = 10
 
-    an example of an arithmetic expression to solve would be to
+    an example of an algebraic expression to solve would be to
     "9*b-((d+b)-a+0*b)+(a-d)" with the result "2*a+8*b-2*d".
 
     Attributes:
-        len_expression: Integer defining number of terms of algebraic 
-            expression.
-        simplify_expression: Boolean. If true, algebraic expression is 
-            additionally being simplified.
+        num_terms: Integer defining number of terms of algebraic expression.
+        use_simplify: Boolean. If true, algebraic expression is being
+            additionally simplified.
         ooperators: List of operators used to build algebraic expression.
         variables: List of variables used to build algebraic expression.
         scalars: List of scalars used to build algebraic expression.
@@ -47,9 +45,11 @@ class AlgebraicDataset(IterableDataset):
         idx_to_char:
     """
 
-    max_number = 10
-    operator_set = "+-"
-    variable_set = "xyz"
+    max_number = 9
+    operator_set = ["+", "-"]
+    variable_set = ["x", "y", "z"]
+
+    # These probabilities determine properties of expressions.
     p_scalar_term = 0.5
     p_scalar_multiplier = 0.5
     p_second_term = 0.5
@@ -59,40 +59,57 @@ class AlgebraicDataset(IterableDataset):
     def __init__(
         self,
         num_terms: int = 4,
-        simplify_expression: bool = True,
-        max_input_length: int = 64,
+        use_simplify: bool = True,
         max_output_length: int = 16,
     ) -> None:
-        self.num_terms = num_terms  # TODO: Find better name for variable.
-        self.simplify_expression = simplify_expression
-
+        """Initializes an insance of AlgebraicDataset.
+        """
+        self.num_terms = num_terms
+        self.use_simplify = use_simplify 
         self.operators = list(self.operator_set)
         self.variables = list(self.variable_set)
-        self.scalars = list(map(str, range(self.max_number)))
+        self.scalars = list(map(str, range(self.max_number + 1)))
 
+        # List of all characters used for expressions is comprised of scalar 
+        # values, variables, operators, brackets, and blank spaces for padding.
         chars = (
-            self.scalars + self.operators + self.variables + ["*"] + ["(", ")"] + [" "]
+            self.scalars 
+            + self.operators 
+            + self.variables 
+            + ["*"] + ["(", ")"] + [" "]
         )
+
+        # Lookup table for character-index-translation.
         self.char_to_idx = {char: idx for idx, char in enumerate(chars)}
         self.idx_to_char = {idx: char for idx, char in enumerate(chars)}
-
-        # TODO: Compute correct max input and output length
-        # max_atomic_length = 5  # (a+b)
-        #                          ^^^^^
-        #                          12345
-        # self.max_input_length = self.num_terms * max_atomic_length
-        self.max_input_length = (
-            max_input_length if max_input_length else self._max_input_length()
-        )
-        self.max_output_length = (
-            max_output_length if max_output_length else self._max_output_length()
-        )
-
         self.num_tokens = len(self.char_to_idx)
 
-    def _max_input_length(self) -> int:
-        """Computes maximum input lenght required for padding."""
-        raise NotImplementedError
+        self.max_input_length = self._comp_max_input_length()
+        self.max_output_length = (
+            max_output_length if max_output_length else self._comp_max_output_length()
+        )
+
+    def _comp_max_input_length(self) -> int:
+        """Computes maximum input lenght for padding.
+
+        To determine the maximum input length we assume expressions consisting
+        only of addition or multiplication operations (depending on the set of
+        operations choosen). 
+        
+        For scalars 0 to 9, the maximum length of a single term is five 
+        characters: (2a+3b)
+                    1234567
+
+        Returns:
+            Maximum length of input.
+        """
+        n_operator = 1  # Lenght of operator (+, -, *).
+        n_brackets = 2  # Lenght of opening and closing brackets.
+        n_max_term = n_brackets + n_operator + 2 * len(str(self.max_number))
+        max_len_input = n_max_term + (self.num_terms - 1) * (
+            n_max_term + n_operator + n_brackets 
+        )
+        return max_len_input
 
     def _max_output_length(self) -> int:
         """Computes maximum output lenght required for padding."""
@@ -125,7 +142,7 @@ class AlgebraicDataset(IterableDataset):
         # Append initial term.
         expression.append(self._get_term())
 
-        for _ in range(self.num_terms):
+        for _ in range(self.num_terms - 1):
             term = self._get_term()
             operator = random.choice(self.operators)
 
@@ -151,7 +168,7 @@ class AlgebraicDataset(IterableDataset):
         while True:
             expression = self.generate_expression()
             result = str(parse_expr(expression, evaluate=True))
-            if self.simplify_expression:
+            if self.use_simplify:
                 result = simplify(result)
             result = str(result).replace(" ", "")
 
