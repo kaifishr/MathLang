@@ -144,9 +144,11 @@ class MetaLinear3(torch.nn.Module):
         # 2) Compute weight matrix as result of an outer product.
         w = torch.einsum("bsi,bsj->bsij", w_2, w_1)
         w = w.reshape(batch_size * seq_len, self.out_features, self.in_features)
+        w = torch.nn.functional.layer_norm(w, normalized_shape=(self.in_features,))
 
         # 3) Compute bias weights.
         b = self.linear_b(x)
+        b = torch.nn.functional.layer_norm(b, normalized_shape=(self.out_features,))
         b = b.reshape(batch_size * seq_len, self.out_features, 1)
 
         # 4) Reshape input for matrix multiplication by folding sequence 
@@ -287,7 +289,7 @@ class MlpBlock(nn.Module):
         hidden_dim = expansion_factor * dim
 
         self.mlp_block = nn.Sequential(
-            MetaLinear3(in_features=dim, out_features=hidden_dim),
+            # MetaLinear(in_features=dim, out_features=hidden_dim),
             # MetaLinear(in_features=hidden_dim, out_features=dim),
             nn.Linear(in_features=dim, out_features=hidden_dim),
             nn.Linear(in_features=hidden_dim, out_features=dim),
