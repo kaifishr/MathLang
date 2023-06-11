@@ -15,7 +15,7 @@ dataloader:
 #########
 model:
   # type: convmixer, mlpmixer, cnn, transformer
-  type: "mlpmixer"
+  type: "convmixer"
   num_blocks: 4
   embedding_dim: 16
   expansion_factor: 1  # MLP-Mixer / Transformer

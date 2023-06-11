@@ -43,8 +43,9 @@ class BooleanDataset(IterableDataset):
     """
 
     max_number = 9
-    compare_set = ["<", ">", "<=", ">=", "==", "!="]
-    boolean_set = ["and", "or", "not"]
+    relation_set = ["<", ">", "<=", ">=", "==", "!="]
+    operator_set = ["and", "or"]  # , "not"]
+    booleans_set = ["True", "False"]
 
     # These probabilities determine properties of expressions.
     p_second_term = 0.5
@@ -58,16 +59,19 @@ class BooleanDataset(IterableDataset):
         """Initializes an insance of AlgebraicDataset.
         """
         self.num_terms = num_terms
-        self.compare = list(self.compare_set)
-        self.boolean = list(self.boolean_set)
         self.scalars = list(map(str, range(self.max_number + 1)))
+        self.relational = list(self.relation_set)
+        self.operators = list(self.operator_set)
+        self.booleans = list(self.booleans_set)
 
         # List of all characters used for expressions is comprised of scalars,
-        # compare, booleans operators, brackets, and blank spaces for padding.
+        # relational operators, booleans operators, brackets, and blank spaces 
+        # for padding.
         chars = (
             self.scalars 
-            + self.boolean 
-            + self.scalars 
+            + self.relational 
+            + self.operators
+            + self.booleans
             + ["(", ")"] + [" "]
         )
 
@@ -79,16 +83,14 @@ class BooleanDataset(IterableDataset):
         self.max_input_length = self._comp_max_input_length()
         self.max_output_length = 1  # True or False
 
+        print(f"Maximum input sequence lenght: {self.max_input_length}")
+        print(f"Maximum output sequence lenght: {self.max_output_length}")
+
     def _comp_max_input_length(self) -> int:
         """Computes maximum input lenght for padding.
 
-        To determine the maximum input length we assume expressions consisting
-        only of addition or multiplication operations (depending on the set of
-        operations choosen). 
-        
-        For scalars 0 to 9, and variables [a, b], the maximum length of an
-        atomic term is nine characters: (2*a+3*b)
-                                        123456789
+        Every logical expression is enclosed in brackets ((!(a&b))|c), where
+        `a`, `b`, and `c` are boolean variables.
 
         Returns:
             Integer representing maximum length of input sequence.
@@ -99,13 +101,11 @@ class BooleanDataset(IterableDataset):
         # Total lenght of opening and closing brackets.
         n_brackets = 2
         # Total length of operators.
-        n_operators = 3
-        # Total lenght of single characer variables.
-        n_variables = 2
+        n_operators = 1
         # Total length of characters used to display scalars.
         n_scalars = 2 * len(str(self.max_number))
 
-        n_max_term = n_brackets + n_operators + n_variables + n_scalars
+        n_max_term = n_brackets + n_operators + n_scalars
 
         # Operators used to concatenate terms.
         n_concat_operators = 1
@@ -115,28 +115,10 @@ class BooleanDataset(IterableDataset):
         )
         return max_len_input
 
-    def _comp_max_output_length(self) -> int:
-        """Computes maximum output lenght required for padding.
-        
-        Ok, here we are lazy because the weather is good and we want to go
-        outside. We just assume that the simplified output is never longer 
-        than the input.
-
-        Returns:
-            Integer representing maximum length of output sequence.
-        """
-        return self._comp_max_input_length()
-
     def generate_term(self) -> str:  # TODO: use better function names.
         """Generates random term."""
-        if random.random() < self.p_scalar_term:
-            term = random.choice(self.scalars)
-        else:
-            term = random.choice(self.variables)
-            if random.random() < self.p_scalar_multiplier:
-                scalar = random.choice(self.scalars)
-                term = f"{scalar}*{term}"
-        return term
+        term = random.choice(self.booleans)
+        return f"({term})"
 
     def _get_term(self) -> str:
         """Generates random term of random length."""
@@ -144,8 +126,8 @@ class BooleanDataset(IterableDataset):
         if random.random() < self.p_second_term:
             term2 = self.generate_term()
             operator = random.choice(self.operators)
-            term = f"({term}{operator}{term2})"
-        return term
+            return f"({term}{operator}{term2})"
+        return f"({term})"
 
     def generate_expression(self) -> str:
         """Generates random algebraic expression."""
@@ -179,21 +161,17 @@ class BooleanDataset(IterableDataset):
     def __iter__(self) -> tuple[torch.Tensor, torch.Tensor]:
         while True:
             expression = self.generate_expression()
-            result = str(parse_expr(expression, evaluate=True))
-            if self.use_simplify:
-                result = simplify(result)
-            result = str(result).replace(" ", "")
+            result = str(eval(expression))
 
-            if len(result) > self.max_len:
-                self.max_len = len(result)
-                print(self.max_len)
+            print(f"{expression = }")
+            print(f"{result = }")
+            exit()
 
-            # Add padding so that expressions and results are always of the 
-            # same length.
+            # Add padding so that expressions and results have the same length.
             expression = expression.ljust(self.max_input_length, " ")
             result = result.ljust(self.max_output_length, " ")
 
-            # Encode expression and result using translation table.
+            # Encode expression and result using lookup table.
             x_encoded = [self.char_to_idx[char] for char in expression]
             y_encoded = [self.char_to_idx[char] for char in result]
             x_data = torch.tensor(data=x_encoded, dtype=torch.long)
@@ -207,14 +185,14 @@ def main():
     torch.manual_seed(42)
     random.seed(42)
 
-    dataset = AlgebraicDataset(
+    dataset = BooleanDataset(
         num_terms=8
     )
     dataloader = DataLoader(dataset, batch_size=2, num_workers=2)
     for i, (x, y) in enumerate(dataloader):
         print(f"{x = }")
         print(f"{y = }")
-        if i == 3:
+        if i == 2:
             break
 
 if __name__ == "__main__":
