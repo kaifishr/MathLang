@@ -2,15 +2,15 @@
 
 ## Motivation
 
-Mathematical expressions, such as arithmetic or algebraic ones, can be generated quickly, at low cost, and with arbitrarily high complexity. Furthermore, these expressions come with short- and long-range dependencies, which makes them useful to train a network to learn long-range dependencies between tokens in a sequence.
+Arithmetic or algebraic expressions can be generated quickly, at low cost, and with arbitrarily high complexity. Furthermore, they come with short- and long-range dependencies, which makes them useful to train a neural network to learn long-range interactions between tokens in a sequence.
 
-Algebraic and arithmetic expressions are well-suited for learning how to resolve complex relationships between terms, encourage a neural network to set terms into relation with each other, and perform sequential reasoning as such expressions are often nested and need to be solved starting from the lowest level upwards.
+Algebraic and arithmetic expressions are well-suited for learning how to resolve complex relationships between items of a sequence encouraging a neural network to set terms into relation with each other, and perform sequential reasoning as these expressions are often nested and need to be resolved starting from the lowest level upwards.
 
-Solving arithmetic expressions or simplifying complex algebraic expressions by expressing them in a more concise and manageable form requires following a certain set of rules and techniques that the network needs to learn during training.
+Solving arithmetic expressions or simplifying complex algebraic expressions by expressing them in a more concise and manageable form also requires following a certain set of rules and techniques that the network needs to learn during training.
 
 For example, the network must learn that brackets determine the processing order of terms or that terms far apart in the sequence can cancel each other out. In more detail, simplifying or solving mathematical expressions requires the network to learn the distributive, commutative, and associative laws, to simplify expressions within parentheses first (if necessary), then perform any exponents, followed by multiplication and division, and finally addition and subtraction. Last but not least, the network needs to learn to remove redundant brackets and sort the simplified expression to arrive at its final form.
 
-The ease of generating arbitrary complex mathematical expressions combined with their numerous interesting properties makes them interesting for experiments where the capabilities of networks or novel network architectures want to be tested.
+The ease of generating arbitrary complex mathematical expressions combined with their numerous interesting properties makes them an interesting choice for experiments wherever capabilities of networks are to be compared or novel network architectures tested.
 
 ## Algebraic and Arithmetic Expressions
 

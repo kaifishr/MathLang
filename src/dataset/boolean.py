@@ -79,9 +79,11 @@ class BooleanDataset(IterableDataset):
         self.char_to_idx = {char: idx for idx, char in enumerate(chars)}
         self.idx_to_char = {idx: char for idx, char in enumerate(chars)}
         self.num_tokens = len(self.char_to_idx)
+        print(f"{self.char_to_idx =}")
+        print(f"{self.idx_to_char =}")
 
         self.max_input_length = self._comp_max_input_length()
-        self.max_output_length = 1  # True or False
+        self.max_output_length = 2  # True or False
 
         print(f"Maximum input sequence lenght: {self.max_input_length}")
         print(f"Maximum output sequence lenght: {self.max_output_length}")
@@ -165,19 +167,20 @@ class BooleanDataset(IterableDataset):
 
             print(f"{expression = }")
             print(f"{result = }")
-            exit()
 
-            # Add padding so that expressions and results have the same length.
-            expression = expression.ljust(self.max_input_length, " ")
-            result = result.ljust(self.max_output_length, " ")
+            yield expression, result
 
-            # Encode expression and result using lookup table.
-            x_encoded = [self.char_to_idx[char] for char in expression]
-            y_encoded = [self.char_to_idx[char] for char in result]
-            x_data = torch.tensor(data=x_encoded, dtype=torch.long)
-            y_data = torch.tensor(data=y_encoded, dtype=torch.long)
+            # # Add padding so that expressions and results have the same length.
+            # expression = expression.ljust(self.max_input_length, " ")
+            # result = result.ljust(self.max_output_length, " ")
 
-            yield x_data, y_data
+            # # Encode expression and result using lookup table.
+            # x_encoded = [self.char_to_idx[char] for char in expression]
+            # y_encoded = [self.char_to_idx[char] for char in result]
+            # x_data = torch.tensor(data=x_encoded, dtype=torch.long)
+            # y_data = torch.tensor(data=y_encoded, dtype=torch.long)
+
+            # yield x_data, y_data
 
 
 def main():
@@ -188,11 +191,11 @@ def main():
     dataset = BooleanDataset(
         num_terms=8
     )
-    dataloader = DataLoader(dataset, batch_size=2, num_workers=2)
+    dataloader = DataLoader(dataset, batch_size=2, num_workers=0)
     for i, (x, y) in enumerate(dataloader):
-        print(f"{x = }")
-        print(f"{y = }")
-        if i == 2:
+        # print(f"{x = }")
+        # print(f"{y = }")
+        if i == 4:
             break
 
 if __name__ == "__main__":
