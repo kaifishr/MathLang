@@ -2,7 +2,7 @@
 """
 from src.config.config import init_config
 from src.dataloader import get_dataloader
-from src.modules.model import MLPMixer
+from src.modules.model import Transformer
 from src.tester import Tester
 from src.utils.tools import set_random_seed
 from src.utils.tools import load_checkpoint
@@ -19,7 +19,7 @@ def run_experiment(num_iter: int):
     dataloader = get_dataloader(config=config)
 
     # Get the model.
-    model = MLPMixer(config=config, num_iter=num_iter)
+    model = Transformer(config=config, num_iter=num_iter)
 
     # Load model weights.
     load_checkpoint(
@@ -43,6 +43,6 @@ def run_experiment(num_iter: int):
 
 if __name__ == "__main__":
 
-    num_iters = [1, 2, 4, 8, 16, 32]
+    num_iters = [1, 2, 4, 8, 16, 32, 64]
     for num_iter in num_iters:
         run_experiment(num_iter=num_iter)
