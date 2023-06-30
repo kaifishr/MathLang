@@ -1,4 +1,6 @@
 """Collection of custom neural networks."""
+import random
+
 import torch
 import torch.nn as nn
 
@@ -13,38 +15,8 @@ from src.modules.module import ConvClassifier
 from src.modules.module import TransformerBlock
 from src.modules.module import PositionEmbedding
 from src.modules.module import TokenEmbedding
+from src.modules.module import IterationEmbedding
 from src.utils.tools import init_weights
-
-
-import random
-class MLPMixer_(nn.Module):
-    """Character-level isotropic MLP-Mixer."""
-
-    def __init__(self, config: Config, num_iter: int = None):
-        """Initializes MLPMixer."""
-        super().__init__()
-        self.num_iter = num_iter
-        self.token_embedding = TokenEmbedding(config)
-        self.position_embedding = PositionEmbedding(config)
-
-        num_blocks = config.model.num_blocks
-        mixer_blocks = [MixerBlock(config) for _ in range(num_blocks)]
-        self.mixer_blocks = nn.Sequential(*mixer_blocks)
-        self.classifier = Classifier(config)
-
-        self.apply(init_weights)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.token_embedding(x)
-        x = self.position_embedding(x)
-        num_iter = self.num_iter or random.randint(4, 16)
-        counter = torch.linspace(1.0, 0.0, num_iter)
-        # x[:, 1, 1] = num_iter
-        for i in range(num_iter):
-            x[:, 0, 0] = counter[i]
-            x = self.mixer_blocks(x)
-        x = self.classifier(x)
-        return x
 
 
 class MLPMixer(nn.Module):
@@ -139,5 +111,68 @@ class Transformer(nn.Module):
         x = self.token_embedding(x)
         x = self.position_embedding(x)
         x = self.transformer_blocks(x)
+        x = self.classifier(x)
+        return x
+
+
+############################# Highly experimental #############################
+
+
+class Transformer(nn.Module):
+    """Isotropic multi-head self-attention transformer neural network."""
+
+    def __init__(self, config: Config, num_iter: int = None):
+        """Initializes transformer module."""
+        super().__init__()
+        self.max_num_iter = 16
+        self.num_iter = num_iter
+        self.iteration_embedding = IterationEmbedding(config)
+        self.token_embedding = TokenEmbedding(config)
+        self.position_embedding = PositionEmbedding(config)
+
+        num_blocks = config.model.num_blocks
+        blocks = [TransformerBlock(config) for _ in range(num_blocks)]
+        self.transformer_blocks = nn.Sequential(*blocks)
+        self.classifier = Classifier(config)
+
+        self.apply(init_weights)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.token_embedding(x)
+        x = self.position_embedding(x)
+        ####
+        num_iter = self.num_iter or random.randint(1, self.max_num_iter)
+        x = self.iteration_embedding(x, num_iter=num_iter)
+        for _ in range(num_iter):
+            x = self.transformer_blocks(x)
+        ####
+        x = self.classifier(x)
+        return x
+
+class MLPMixer(nn.Module):
+    """Character-level isotropic MLP-Mixer."""
+
+    def __init__(self, config: Config, num_iter: int = None):
+        """Initializes MLPMixer."""
+        super().__init__()
+        self.num_iter = num_iter
+        self.token_embedding = TokenEmbedding(config)
+        self.position_embedding = PositionEmbedding(config)
+
+        num_blocks = config.model.num_blocks
+        mixer_blocks = [MixerBlock(config) for _ in range(num_blocks)]
+        self.mixer_blocks = nn.Sequential(*mixer_blocks)
+        self.classifier = Classifier(config)
+
+        self.apply(init_weights)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.token_embedding(x)
+        x = self.position_embedding(x)
+        num_iter = self.num_iter or random.randint(4, 16)
+        counter = torch.linspace(1.0, 0.0, num_iter)
+        for i in range(num_iter):
+            x[:, 0, 0] = counter[i]
+            x = self.mixer_blocks(x)
         x = self.classifier(x)
         return x

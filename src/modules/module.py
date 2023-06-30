@@ -1,4 +1,6 @@
 """Common modules for neural networks."""
+import math
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -95,6 +97,33 @@ class PositionEmbedding(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = x + self.embedding
+        return x
+
+
+class IterationEmbedding(nn.Module):
+    """Iteration embedding module.
+
+    Attributes:
+        sequence_length:
+        embedding_dim:
+    """
+
+    def __init__(self, config: Config) -> None:
+        """Initializes PositionalEmbedding.
+        
+        Args:
+        
+        """
+        super().__init__()
+        self.embedding_dim = config.model.embedding_dim
+
+    def forward(self, x: torch.Tensor, num_iter: int) -> torch.Tensor:
+        half_dim = self.embedding_dim // 2
+        embeddings = math.log(10000) / (half_dim)
+        embeddings = torch.exp(torch.arange(half_dim) * -embeddings)
+        embeddings = num_iter * embeddings[None, :]
+        embeddings = torch.cat((embeddings.sin(), embeddings.cos()), dim=-1)
+        x = x + embeddings
         return x
 
 

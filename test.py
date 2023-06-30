@@ -43,6 +43,6 @@ def run_experiment(num_iter: int):
 
 if __name__ == "__main__":
 
-    num_iters = [1, 2, 4, 8, 16, 20]
+    num_iters = [1, 2, 4, 8, 16, 32]
     for num_iter in num_iters:
         run_experiment(num_iter=num_iter)
