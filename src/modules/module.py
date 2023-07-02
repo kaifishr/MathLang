@@ -100,32 +100,41 @@ class PositionEmbedding(nn.Module):
         return x
 
 
-class IterationEmbedding(nn.Module):
-    """Iteration embedding module.
+class TimeEmbedding(nn.Module):
+    """Time embedding module.
+
+    Basically an thinking step embedding.
 
     Attributes:
         sequence_length:
         embedding_dim:
+        linear_1:
+        linear_2:
     """
 
     def __init__(self, config: Config) -> None:
-        """Initializes PositionalEmbedding.
+        """Initializes TimelEmbedding.
         
         Args:
         
         """
         super().__init__()
         self.embedding_dim = config.model.embedding_dim
+        self.linear_1 = nn.Linear(
+            in_features=1, 
+            out_features=self.embedding_dim
+        )
+        self.linear_2 = nn.Linear(
+            in_features=self.embedding_dim, 
+            out_features=self.embedding_dim
+        )
 
-    def forward(self, x: torch.Tensor, num_iter: int) -> torch.Tensor:
-        half_dim = self.embedding_dim // 2
-        embeddings = math.log(10000) / (half_dim)
-        embeddings = torch.exp(torch.arange(half_dim) * -embeddings)
-        embeddings = num_iter * embeddings[None, :]
-        embeddings = torch.cat((embeddings.sin(), embeddings.cos()), dim=-1)
-        x = x + embeddings
+    def forward(self, x: torch.Tensor, t: int) -> torch.Tensor:
+        time_step = torch.tensor(t).float().view(-1, 1).to(x.device)
+        time_embedding = self.linear_2(torch.sin(self.linear_1(time_step)))
+        x = x + time_embedding
         return x
-
+    
 
 class MetaLinear3(torch.nn.Module):
     """Linear meta layer.

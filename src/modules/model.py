@@ -15,7 +15,7 @@ from src.modules.module import ConvClassifier
 from src.modules.module import TransformerBlock
 from src.modules.module import PositionEmbedding
 from src.modules.module import TokenEmbedding
-from src.modules.module import IterationEmbedding
+from src.modules.module import TimeEmbedding
 from src.utils.tools import init_weights
 
 
@@ -126,7 +126,7 @@ class Transformer(nn.Module):
         super().__init__()
         self.max_num_iter = 16
         self.num_iter = num_iter
-        self.iteration_embedding = IterationEmbedding(config)
+        self.time_embedding = TimeEmbedding(config)
         self.token_embedding = TokenEmbedding(config)
         self.position_embedding = PositionEmbedding(config)
 
@@ -142,7 +142,7 @@ class Transformer(nn.Module):
         x = self.position_embedding(x)
         ####
         num_iter = self.num_iter or random.randint(1, self.max_num_iter)
-        x = self.iteration_embedding(x, num_iter=num_iter)
+        x = self.time_embedding(x, t=num_iter)
         for _ in range(num_iter):
             x = self.transformer_blocks(x)
         ####
