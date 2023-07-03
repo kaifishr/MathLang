@@ -34,7 +34,7 @@ where the network's task is to compute the scalar result $-14$. Here, Python's `
 - How does the network perform if it has more time to "think"?
     - Is it possible to "simulate" big networks.
 - How do meta layers perform?
-- Can mathematical expressions used for a pretraining strategy for langauge modles.
+- Can mathematical expressions used for a pretraining strategy for langauge models?
 
 ## TODOs
 
