@@ -4,15 +4,13 @@
 
 Arithmetic or algebraic expressions can be generated quickly, at low cost, and with arbitrarily high complexity. Furthermore, they come with short- and long-range dependencies, which makes them useful to train a neural network to learn long-range interactions between tokens in a sequence.
 
-Algebraic and arithmetic expressions are well-suited for learning how to resolve complex relationships between items of a sequence encouraging a neural network to set terms into relation with each other, and perform sequential reasoning as these expressions are often nested and need to be resolved starting from the lowest level upwards.
-
-Solving arithmetic expressions or simplifying complex algebraic expressions by expressing them in a more concise and manageable form also requires following a certain set of rules and techniques that the network needs to learn during training.
-
-For example, the network must learn that brackets determine the processing order of terms or that terms far apart in the sequence can cancel each other out. In more detail, simplifying or solving mathematical expressions requires the network to learn the distributive, commutative, and associative laws, to simplify expressions within parentheses first (if necessary), then perform any exponents, followed by multiplication and division, and finally addition and subtraction. Last but not least, the network needs to learn to remove redundant brackets and sort the simplified expression to arrive at its final form.
-
-The ease of generating arbitrary complex mathematical expressions combined with their numerous interesting properties makes them an interesting choice for experiments wherever capabilities of networks are to be compared or novel network architectures tested.
-
 ## Algebraic and Arithmetic Expressions
+
+Algebraic and arithmetic expressions are well-suited for learning how to resolve complex relationships between items of a sequence encouraging a neural network to set terms into relation with each other, and perform sequential reasoning as these expressions are often nested and need to be resolved starting from the lowest level upwards. Solving arithmetic expressions or simplifying complex algebraic expressions by expressing them in a more concise and manageable form also requires following a certain set of rules and techniques that the network needs to learn during training.
+
+For example, the network must learn that brackets determine the processing order of terms or that terms far apart in the sequence can cancel each other out. In more detail, simplifying or solving mathematical expressions requires the network to learn the distributive, commutative, and associative laws, to simplify expressions within parentheses first (if necessary), then perform any exponents, followed by multiplication and division, and finally addition and subtraction. Last but not least, the network needs to learn to remove redundant brackets and sort (in case of solving algebraic expressions with *SymPy*) the simplified expression to arrive at its final form.
+
+The ease of generating arbitrary complex mathematical expressions combined with their numerous interesting properties makes them an interesting choice for experiments wherever capabilities of networks are to be compared, novel network architectures tested, or for pre-training. Recent advances in natual language processing show, specifically the paper [Textbooks Are All You Need](https://arxiv.org/abs/2306.11644) with their *phi-1* model, some remarkable results from using syntethic data such as proposed by this project.
 
 An [algebraic expression](https://en.wikipedia.org/wikiAlgebraic_expression) is a [mathematical expression](https://en.wikipedia.org/wiki/Expression_(mathematics)) that follows a well-formed syntax, carries semantic meaning, consists of terms, variables, constants, and mathematical operations such as addition, subtraction, multiplication, division, and exponentiation, and can look as follows:
 
@@ -45,3 +43,7 @@ where the network's task is to compute the scalar result $-14$. Here, Python's `
     - experiments ...
 - Compute correct max input and output length for padding.
 - Add check so that input / output sequence does not exceed length.
+
+## License
+
+MIT
