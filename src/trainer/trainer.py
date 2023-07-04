@@ -74,10 +74,11 @@ class Trainer:
             model.parameters(), lr=learning_rate, weight_decay=weight_decay
         )
 
-        # Get index of padding token.
+        # Get index of to ignored padding token.
         self.ignore_index = self.dataloader.dataset.char_to_idx[" "]
         self.criterion = torch.nn.CrossEntropyLoss(
-            ignore_index=self.ignore_index
+            # ignore_index=self.ignore_index
+            reduction="none",
         )
 
         self.running_loss = 0.0
@@ -110,7 +111,11 @@ class Trainer:
             labels = labels.view(-1)
 
             # Compute loss.
-            loss = criterion(outputs, labels)
+            loss = criterion(outputs, labels)   # Compute unreduced loss
+            mask = labels != self.ignore_index  # Compute loss mask
+            loss = loss.where(mask, 0.0)        # Mask loss
+            loss = loss.sum() / mask.sum()      # Reduce ignoring masked items
+            # alternatively use loss = torch.masked_select(loss, mask).mean() 
 
             # Backpropagation.
             loss.backward()
