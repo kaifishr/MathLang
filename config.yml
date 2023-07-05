@@ -15,9 +15,9 @@ dataloader:
 #########
 model:
   # type: convmixer, mlpmixer, cnn, transformer
-  type: "transformer"
+  type: "mlpmixer"
   num_blocks: 2
-  embedding_dim: 64
+  embedding_dim: 256
   expansion_factor: 1  # MLP-Mixer / Transformer
   kernel_size: 3       # ConvMixer / CNN
   dropout_prob: 0
