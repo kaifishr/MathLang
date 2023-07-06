@@ -68,15 +68,15 @@ summary:
   save_test_stats:
     every_n_updates: -1
   save_model:
-    every_n_updates: 10000
+    every_n_updates: 1000
   add_position_embeddings:
-    every_n_updates: 10000
+    every_n_updates: 1000
   add_token_embeddings:
-    every_n_updates: 10000
+    every_n_updates: 1000
   add_linear_weights:
-    every_n_updates: 10000
+    every_n_updates: 1000
   add_mask_weights:
-    every_n_updates: 10000
+    every_n_updates: 1000
   add_graph: false
 
 ###############

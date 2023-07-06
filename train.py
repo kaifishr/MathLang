@@ -1,5 +1,4 @@
-"""Main script to run trainings.
-"""
+"""Main script to run trainings."""
 from src.config.config import init_config
 from src.dataloader import get_dataloader
 from src.modules.model import MLPMixer
