@@ -32,10 +32,7 @@ class Trainer:
     """
 
     def __init__(
-        self, 
-        model: torch.nn.Module, 
-        dataloader: DataLoader, 
-        config: Config
+        self, model: torch.nn.Module, dataloader: DataLoader, config: Config
     ) -> None:
         """Initializes Trainer."""
         self.model = model
@@ -62,10 +59,7 @@ class Trainer:
         # Add graph of model to Tensorboard.
         if config.summary.add_graph:
             add_graph(
-                model=model, 
-                dataloader=dataloader, 
-                writer=self.writer, 
-                config=config
+                model=model, dataloader=dataloader, writer=self.writer, config=config
             )
 
         learning_rate = config.trainer.learning_rate
@@ -111,15 +105,15 @@ class Trainer:
             labels = labels.view(-1)
 
             # Compute loss.
-            loss = criterion(outputs, labels)   # Compute unreduced loss
+            loss = criterion(outputs, labels)  # Compute unreduced loss
             print(f"{loss = }")
             exit()
             mask = labels != self.ignore_index  # Compute loss mask
-            loss = loss.where(mask, 0.0)        # Mask loss
-            loss = loss.sum() / mask.sum()      # Reduce ignoring masked items
+            loss = loss.where(mask, 0.0)  # Mask loss
+            loss = loss.sum() / mask.sum()  # Reduce ignoring masked items
             print(f"{loss = }")
             exit()
-            # alternatively use loss = torch.masked_select(loss, mask).mean() 
+            # alternatively use loss = torch.masked_select(loss, mask).mean()
 
             # Backpropagation.
             loss.backward()
@@ -136,7 +130,7 @@ class Trainer:
             self.running_loss += loss.item()
             mask = torch.where(labels != self.ignore_index, 1, 0)
             self.running_accuracy += (
-                (mask*(torch.argmax(outputs, dim=1) == labels)).float().sum()
+                (mask * (torch.argmax(outputs, dim=1) == labels)).float().sum()
             )
             self.running_counter += labels.size(0)  # TODO: mask.sum()
 
@@ -157,20 +151,13 @@ class Trainer:
 
         if config.summary.save_train_stats.every_n_updates > 0:
             if (update_step + 1) % config.summary.save_train_stats.every_n_updates == 0:
-
                 train_loss = self.running_loss / self.running_counter
                 train_accuracy = self.running_accuracy / self.running_counter
 
-                writer.add_scalar(
-                    "train/loss", 
-                    train_loss, 
-                    global_step=update_step
-                )
+                writer.add_scalar("train/loss", train_loss, global_step=update_step)
 
                 writer.add_scalar(
-                    "train/accuracy", 
-                    train_accuracy, 
-                    global_step=update_step
+                    "train/accuracy", train_accuracy, global_step=update_step
                 )
 
                 self.running_loss = 0.0
@@ -201,12 +188,19 @@ class Trainer:
 
         if config.summary.add_token_embeddings.every_n_updates > 0:
             if update_step % config.summary.add_token_embeddings.every_n_updates == 0:
-                add_token_embedding_weights(model=model, writer=writer, global_step=update_step)
+                add_token_embedding_weights(
+                    model=model, writer=writer, global_step=update_step
+                )
 
         if config.summary.add_position_embeddings.every_n_updates > 0:
-            if (update_step % config.summary.add_position_embeddings.every_n_updates == 0):
-                add_position_embedding_weights(model=model, writer=writer, global_step=update_step)
+            if (
+                update_step % config.summary.add_position_embeddings.every_n_updates
+                == 0
+            ):
+                add_position_embedding_weights(
+                    model=model, writer=writer, global_step=update_step
+                )
 
         if config.summary.add_mask_weights.every_n_updates > 0:
-            if (update_step % config.summary.add_mask_weights.every_n_updates == 0):
+            if update_step % config.summary.add_mask_weights.every_n_updates == 0:
                 add_mask_weights(model=model, writer=writer, global_step=update_step)

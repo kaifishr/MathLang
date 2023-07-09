@@ -13,8 +13,8 @@ class TokenEmbedding(nn.Module):
 
     Token embedding for MLP-Mixer and convolutional neural networks.
 
-    Embeds the integer representing a character token as a vector of given 
-    dimension for MLP-Mixer networks or as a square feature map for 
+    Embeds the integer representing a character token as a vector of given
+    dimension for MLP-Mixer networks or as a square feature map for
     convolutional networks.
 
     Attributes:
@@ -114,19 +114,15 @@ class TimeEmbedding(nn.Module):
 
     def __init__(self, config: Config) -> None:
         """Initializes TimelEmbedding.
-        
+
         Args:
-        
+
         """
         super().__init__()
         self.embedding_dim = config.model.embedding_dim
-        self.linear_1 = nn.Linear(
-            in_features=1, 
-            out_features=self.embedding_dim
-        )
+        self.linear_1 = nn.Linear(in_features=1, out_features=self.embedding_dim)
         self.linear_2 = nn.Linear(
-            in_features=self.embedding_dim, 
-            out_features=self.embedding_dim
+            in_features=self.embedding_dim, out_features=self.embedding_dim
         )
 
     def forward(self, x: torch.Tensor, t: int) -> torch.Tensor:
@@ -134,14 +130,14 @@ class TimeEmbedding(nn.Module):
         time_embedding = self.linear_2(torch.sin(self.linear_1(time_step)))
         x = x + time_embedding
         return x
-    
+
 
 class MetaLinear3(torch.nn.Module):
     """Linear meta layer.
 
     Meta layers compute weight matrix for their linear transformation
-    dynamically based on the input tensor `x`. To reduce computational costs, 
-    this version of MetaLayer computes two vectors based on the input that are 
+    dynamically based on the input tensor `x`. To reduce computational costs,
+    this version of MetaLayer computes two vectors based on the input that are
     then used to compute an outer product representing the weight matrix.
     """
 
@@ -153,21 +149,15 @@ class MetaLinear3(torch.nn.Module):
         self.out_features = out_features
 
         self.linear_in = torch.nn.Linear(
-            in_features=in_features, 
-            out_features=in_features, 
-            bias=bias
+            in_features=in_features, out_features=in_features, bias=bias
         )
-        
+
         self.linear_out = torch.nn.Linear(
-            in_features=in_features, 
-            out_features=out_features, 
-            bias=bias
+            in_features=in_features, out_features=out_features, bias=bias
         )
 
         self.linear_b = torch.nn.Linear(
-            in_features=in_features, 
-            out_features=out_features, 
-            bias=bias
+            in_features=in_features, out_features=out_features, bias=bias
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -189,7 +179,7 @@ class MetaLinear3(torch.nn.Module):
         b = torch.nn.functional.layer_norm(b, normalized_shape=(self.out_features,))
         b = b.reshape(batch_size * seq_len, self.out_features, 1)
 
-        # 4) Reshape input for matrix multiplication by folding sequence 
+        # 4) Reshape input for matrix multiplication by folding sequence
         # dimensions into batch dimension and by adding additional dimension.
         x = x.reshape(batch_size * seq_len, embed_dim, 1)
 
@@ -203,9 +193,9 @@ class MetaLinear3(torch.nn.Module):
 class MetaLinear2(torch.nn.Module):
     """Meta linear layer class.
 
-    This meta linear layer computes a weight matrices and biases based on the 
+    This meta linear layer computes a weight matrices and biases based on the
     input with which the linear transformation then is performed. To improve
-    performance, the layer first reduces the size of the input features before 
+    performance, the layer first reduces the size of the input features before
     computing the weight matrices.
     """
 
@@ -225,9 +215,7 @@ class MetaLinear2(torch.nn.Module):
         hidden_features = int(hidden_expansion * in_features)
         self.w_linear = torch.nn.Sequential(
             torch.nn.Linear(
-                in_features=in_features, 
-                out_features=hidden_features, 
-                bias=bias
+                in_features=in_features, out_features=hidden_features, bias=bias
             ),
             torch.nn.Linear(
                 in_features=hidden_features,
@@ -237,14 +225,10 @@ class MetaLinear2(torch.nn.Module):
         )
         self.b_linear = torch.nn.Sequential(
             torch.nn.Linear(
-                in_features=in_features, 
-                out_features=hidden_features, 
-                bias=bias
+                in_features=in_features, out_features=hidden_features, bias=bias
             ),
             torch.nn.Linear(
-                in_features=hidden_features, 
-                out_features=out_features, 
-                bias=bias
+                in_features=hidden_features, out_features=out_features, bias=bias
             ),
         )
 
@@ -287,14 +271,10 @@ class MetaLinear(torch.nn.Module):
         self.out_features = out_features
 
         self.w_linear = torch.nn.Linear(
-            in_features=in_features, 
-            out_features=in_features * out_features, 
-            bias=bias
+            in_features=in_features, out_features=in_features * out_features, bias=bias
         )
         self.b_linear = torch.nn.Linear(
-            in_features=in_features, 
-            out_features=out_features, 
-            bias=bias
+            in_features=in_features, out_features=out_features, bias=bias
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -413,8 +393,8 @@ class PointwiseConvolution(nn.Module):
 
         self.pointwise_conv = nn.Sequential(
             nn.Conv2d(
-                sequence_length, 
-                sequence_length, 
+                sequence_length,
+                sequence_length,
                 kernel_size=1,
             ),
             nn.LayerNorm([sequence_length, embedding_dim, embedding_dim]),
@@ -438,9 +418,9 @@ class Convolution(nn.Module):
 
         self.conv_block = nn.Sequential(
             nn.Conv2d(
-                sequence_length, 
-                sequence_length, 
-                kernel_size, 
+                sequence_length,
+                sequence_length,
+                kernel_size,
                 padding="same",
             ),
             nn.LayerNorm([sequence_length, embedding_dim, embedding_dim]),
@@ -474,8 +454,7 @@ class ConvMixerBlock(nn.Module):
         super().__init__()
 
         self.conv_mixer_block = nn.Sequential(
-            DepthwiseConvolution(config=config), 
-            PointwiseConvolution(config=config)
+            DepthwiseConvolution(config=config), PointwiseConvolution(config=config)
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -497,8 +476,7 @@ class Classifier(nn.Module):
             nn.LayerNorm(embedding_dim),
             SwapAxes(axis0=-2, axis1=-1),
             nn.Linear(
-                in_features=input_sequence_length, 
-                out_features=output_sequence_length
+                in_features=input_sequence_length, out_features=output_sequence_length
             ),
             SwapAxes(axis0=-2, axis1=-1),
             nn.Linear(in_features=embedding_dim, out_features=num_classes),
@@ -529,8 +507,7 @@ class ConvClassifier(nn.Module):
             ),
             nn.Flatten(start_dim=2, end_dim=-1),
             nn.Linear(
-                in_features=embedding_dim * embedding_dim, 
-                out_features=num_classes
+                in_features=embedding_dim * embedding_dim, out_features=num_classes
             ),
         )
 
@@ -563,9 +540,7 @@ class Mask(nn.Module):
             elif mask_type == "trainable_multiplicative":
                 mask_params = torch.ones(size=size)
             else:
-                raise NotImplementedError(
-                    f"Mask '{mask_type}' not implemented."
-                )
+                raise NotImplementedError(f"Mask '{mask_type}' not implemented.")
 
             self.mask = nn.Parameter(data=mask_params, requires_grad=True)
 
@@ -616,19 +591,23 @@ class MultiHeadSelfAttention(nn.Module):
         self.dropout_prob = config.model.dropout_prob
 
         self.comp_keys = nn.Linear(
-            in_features=embedding_dim, out_features=embedding_dim,
+            in_features=embedding_dim,
+            out_features=embedding_dim,
         )
         self.comp_queries = nn.Linear(
-            in_features=embedding_dim, out_features=embedding_dim,
+            in_features=embedding_dim,
+            out_features=embedding_dim,
         )
         self.comp_values = nn.Linear(
-            in_features=embedding_dim, out_features=embedding_dim,
+            in_features=embedding_dim,
+            out_features=embedding_dim,
         )
 
         self.mask = Mask(config=config)
 
         self.linear = nn.Linear(
-            in_features=embedding_dim, out_features=embedding_dim,
+            in_features=embedding_dim,
+            out_features=embedding_dim,
         )
 
         self.dropout = nn.Dropout(p=self.dropout_prob)
@@ -644,7 +623,9 @@ class MultiHeadSelfAttention(nn.Module):
 
         # Split keys, queries, and values for processing in different heads.
         keys = keys.view(batch_size, sequence_length, self.num_heads, self.head_dim)
-        queries = queries.view(batch_size, sequence_length, self.num_heads, self.head_dim)
+        queries = queries.view(
+            batch_size, sequence_length, self.num_heads, self.head_dim
+        )
         values = values.view(batch_size, sequence_length, self.num_heads, self.head_dim)
 
         # Scaled dot-product self-attention
@@ -672,7 +653,7 @@ class TransformerBlock(nn.Module):
     def __init__(self, config: Config) -> None:
         super().__init__()
 
-        embedding_dim = config.model.embedding_dim 
+        embedding_dim = config.model.embedding_dim
         expansion_factor = config.model.expansion_factor
         dropout_prob = config.model.dropout_prob
 

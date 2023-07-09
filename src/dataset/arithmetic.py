@@ -85,9 +85,9 @@ class ArithmeticDataset(IterableDataset):
 
         To determine the maximum input length we assume expressions consisting
         only of addition or multiplication operations (depending on the set of
-        operations choosen). 
-        
-        For scalars 0 to 9, the maximum length of a single term is five 
+        operations choosen).
+
+        For scalars 0 to 9, the maximum length of a single term is five
         characters: (a+b)
                     12345
 
@@ -101,9 +101,9 @@ class ArithmeticDataset(IterableDataset):
         # Total length of characters used to display scalars.
         n_scalars = 2 * len(str(self.max_number))
 
-        n_max_term = n_brackets + n_operator + n_scalars 
+        n_max_term = n_brackets + n_operator + n_scalars
         max_len_input = n_max_term + (self.num_terms - 1) * (
-            n_max_term + n_operator + n_brackets 
+            n_max_term + n_operator + n_brackets
         )
         return max_len_input
 
@@ -176,7 +176,6 @@ class ArithmeticDataset(IterableDataset):
 
 
 def main():
-
     torch.manual_seed(42)
     random.seed(42)
 

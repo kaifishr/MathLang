@@ -1,4 +1,3 @@
-
 """Main script to run experiments.
 """
 from src.config.config import init_config
@@ -26,7 +25,7 @@ def run_experiment(num_iter: int):
     load_checkpoint(
         model=model,
         ckpt_dir=config.dirs.weights,
-        model_name=config.load_model.model_name
+        model_name=config.load_model.model_name,
     )
 
     # Move model to GPU if possible.
@@ -34,16 +33,11 @@ def run_experiment(num_iter: int):
     model.eval()
 
     # Run experiment.
-    tester = Tester(
-        model=model, 
-        dataloader=dataloader, 
-        config=config
-    )
+    tester = Tester(model=model, dataloader=dataloader, config=config)
     tester.run()
 
 
 if __name__ == "__main__":
-
     num_iters = [1, 2, 4, 8, 16, 32, 64, 128]
     for num_iter in num_iters:
         run_experiment(num_iter=num_iter)

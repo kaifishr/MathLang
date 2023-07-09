@@ -19,12 +19,10 @@ class Tester:
     """
 
     def __init__(
-        self, model: torch.nn.Module, 
-        dataloader: tuple, 
-        config: Config
+        self, model: torch.nn.Module, dataloader: tuple, config: Config
     ) -> None:
         """Initializes the Tester instance.
-        
+
         Args:
             model:
             dataloader:
@@ -88,15 +86,13 @@ class Tester:
             self.running_counter += labels.size(0)
 
             writer.add_scalar(
-                "test/loss", 
-                self.running_loss / self.running_counter, 
-                global_step=i
+                "test/loss", self.running_loss / self.running_counter, global_step=i
             )
 
             writer.add_scalar(
-                "test/accuracy", 
-                self.running_accuracy / self.running_counter, 
-                global_step=i
+                "test/accuracy",
+                self.running_accuracy / self.running_counter,
+                global_step=i,
             )
 
             if i == num_tests:

@@ -32,10 +32,10 @@ class Calculator:
     """
 
     def __init__(
-        self, 
-        model: torch.nn.Module, 
-        dataset: Dataset, 
-        config: Config, 
+        self,
+        model: torch.nn.Module,
+        dataset: Dataset,
+        config: Config,
     ) -> None:
         """Initializes chat class."""
         self.model = model
@@ -112,7 +112,7 @@ class Calculator:
         """Pads input prompt to have correct size."""
         multpr = self.input_sequence_length // len(prompt) + 1
         prompt = multpr * (" " + prompt)
-        prompt = prompt[-self.input_sequence_length:]
+        prompt = prompt[-self.input_sequence_length :]
         return prompt
 
     def test(self):

@@ -24,7 +24,7 @@ from sympy import simplify
 class AlgebraicDataset(IterableDataset):
     """Creates an iterable dataset of algebraic expressions.
 
-    Creates algebraic expressions. For example, if the following parameters are 
+    Creates algebraic expressions. For example, if the following parameters are
     used:
 
         num_terms = 4
@@ -61,21 +61,17 @@ class AlgebraicDataset(IterableDataset):
         num_terms: int = 4,
         use_simplify: bool = False,
     ) -> None:
-        """Initializes an insance of AlgebraicDataset.
-        """
+        """Initializes an insance of AlgebraicDataset."""
         self.num_terms = num_terms
-        self.use_simplify = use_simplify 
+        self.use_simplify = use_simplify
         self.operators = list(self.operator_set)
         self.variables = list(self.variable_set)
         self.scalars = list(map(str, range(self.max_number + 1)))
 
-        # List of all characters used for expressions is comprised of scalar 
+        # List of all characters used for expressions is comprised of scalar
         # values, variables, operators, brackets, and blank spaces for padding.
         chars = (
-            self.scalars 
-            + self.operators 
-            + self.variables 
-            + ["*"] + ["(", ")"] + [" "]
+            self.scalars + self.operators + self.variables + ["*"] + ["(", ")"] + [" "]
         )
 
         # Lookup table for character-index-translation.
@@ -91,8 +87,8 @@ class AlgebraicDataset(IterableDataset):
 
         To determine the maximum input length we assume expressions consisting
         only of addition or multiplication operations (depending on the set of
-        operations choosen). 
-        
+        operations choosen).
+
         For scalars 0 to 9, and variables [a, b], the maximum length of an
         atomic term is nine characters: (2*a+3*b)
                                         123456789
@@ -118,15 +114,15 @@ class AlgebraicDataset(IterableDataset):
         n_concat_operators = 1
 
         max_len_input = n_max_term + (self.num_terms - 1) * (
-            n_max_term + n_concat_operators + n_brackets 
+            n_max_term + n_concat_operators + n_brackets
         )
         return max_len_input
 
     def _comp_max_output_length(self) -> int:
         """Computes maximum output lenght required for padding.
-        
+
         Ok, here we are lazy because the weather is good and we want to go
-        outside. We just assume that the simplified output is never longer 
+        outside. We just assume that the simplified output is never longer
         than the input.
 
         Returns:
@@ -191,7 +187,7 @@ class AlgebraicDataset(IterableDataset):
                 result = simplify(result)
             result = str(result).replace(" ", "")
 
-            # Add padding so that expressions and results are always of the 
+            # Add padding so that expressions and results are always of the
             # same length.
             expression = expression.ljust(self.max_input_length, " ")
             result = result.ljust(self.max_output_length, " ")
@@ -206,19 +202,17 @@ class AlgebraicDataset(IterableDataset):
 
 
 def main():
-
     torch.manual_seed(42)
     random.seed(42)
 
-    dataset = AlgebraicDataset(
-        num_terms=8
-    )
+    dataset = AlgebraicDataset(num_terms=8)
     dataloader = DataLoader(dataset, batch_size=2, num_workers=2)
     for i, (x, y) in enumerate(dataloader):
         print(f"{x = }")
         print(f"{y = }")
         if i == 3:
             break
+
 
 if __name__ == "__main__":
     main()

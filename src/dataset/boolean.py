@@ -56,8 +56,7 @@ class BooleanDataset(IterableDataset):
         self,
         num_terms: int = 4,
     ) -> None:
-        """Initializes an insance of AlgebraicDataset.
-        """
+        """Initializes an insance of AlgebraicDataset."""
         self.num_terms = num_terms
         self.scalars = list(map(str, range(self.max_number + 1)))
         self.relational = list(self.relation_set)
@@ -65,14 +64,15 @@ class BooleanDataset(IterableDataset):
         self.booleans = list(self.booleans_set)
 
         # List of all characters used for expressions is comprised of scalars,
-        # relational operators, booleans operators, brackets, and blank spaces 
+        # relational operators, booleans operators, brackets, and blank spaces
         # for padding.
         chars = (
-            self.scalars 
-            + self.relational 
+            self.scalars
+            + self.relational
             + self.operators
             + self.booleans
-            + ["(", ")"] + [" "]
+            + ["(", ")"]
+            + [" "]
         )
 
         # Lookup table for character-index-translation.
@@ -113,7 +113,7 @@ class BooleanDataset(IterableDataset):
         n_concat_operators = 1
 
         max_len_input = n_max_term + (self.num_terms - 1) * (
-            n_max_term + n_concat_operators + n_brackets 
+            n_max_term + n_concat_operators + n_brackets
         )
         return max_len_input
 
@@ -184,19 +184,17 @@ class BooleanDataset(IterableDataset):
 
 
 def main():
-
     torch.manual_seed(42)
     random.seed(42)
 
-    dataset = BooleanDataset(
-        num_terms=8
-    )
+    dataset = BooleanDataset(num_terms=8)
     dataloader = DataLoader(dataset, batch_size=2, num_workers=0)
     for i, (x, y) in enumerate(dataloader):
         # print(f"{x = }")
         # print(f"{y = }")
         if i == 4:
             break
+
 
 if __name__ == "__main__":
     main()

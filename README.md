@@ -36,14 +36,6 @@ where the network's task is to compute the scalar result $-14$. Here, Python's `
 - How do meta layers perform?
 - Can mathematical expressions used for a pretraining strategy for langauge models?
 
-## TODOs
-
-- Add extra folder with projects
-    - calculator
-    - experiments ...
-- Compute correct max input and output length for padding.
-- Add check so that input / output sequence does not exceed length.
-
 ## License
 
 MIT

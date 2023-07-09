@@ -149,6 +149,7 @@ class Transformer(nn.Module):
         x = self.classifier(x)
         return x
 
+
 class MLPMixer(nn.Module):
     """Character-level isotropic MLP-Mixer."""
 
