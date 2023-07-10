@@ -69,11 +69,7 @@ class Trainer:
         )
 
         # Get index of to ignored padding token.
-        self.ignore_index = self.dataloader.dataset.char_to_idx[" "]
-        self.criterion = torch.nn.CrossEntropyLoss(
-            ignore_index=self.ignore_index,
-            reduction="none",
-        )
+        self.criterion = torch.nn.CrossEntropyLoss()
 
         self.running_loss = 0.0
         self.running_accuracy = 0.0
@@ -101,19 +97,12 @@ class Trainer:
             # Feedforward.
             outputs = model(inputs)
 
+            # Align outputs and labels.
             outputs = outputs.view(-1, outputs.size(-1))
             labels = labels.view(-1)
 
             # Compute loss.
-            loss = criterion(outputs, labels)  # Compute unreduced loss
-            print(f"{loss = }")
-            exit()
-            mask = labels != self.ignore_index  # Compute loss mask
-            loss = loss.where(mask, 0.0)  # Mask loss
-            loss = loss.sum() / mask.sum()  # Reduce ignoring masked items
-            print(f"{loss = }")
-            exit()
-            # alternatively use loss = torch.masked_select(loss, mask).mean()
+            loss = criterion(outputs, labels)
 
             # Backpropagation.
             loss.backward()
@@ -128,11 +117,10 @@ class Trainer:
 
             # Keeping track of statistics.
             self.running_loss += loss.item()
-            mask = torch.where(labels != self.ignore_index, 1, 0)
             self.running_accuracy += (
-                (mask * (torch.argmax(outputs, dim=1) == labels)).float().sum()
+                (torch.argmax(outputs, dim=1) == labels).float().sum()
             )
-            self.running_counter += labels.size(0)  # TODO: mask.sum()
+            self.running_counter += labels.size(0)
 
             self._train_summary(writer=writer, update_step=update_step)
             self._write_summary(writer=writer, model=model, update_step=update_step)

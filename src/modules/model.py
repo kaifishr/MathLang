@@ -118,7 +118,7 @@ class Transformer(nn.Module):
 ############################# Highly experimental #############################
 
 
-class Transformer(nn.Module):
+class Transformer_v2(nn.Module):
     """Isotropic multi-head self-attention transformer neural network."""
 
     def __init__(self, config: Config, num_iter: int = None):
@@ -150,7 +150,7 @@ class Transformer(nn.Module):
         return x
 
 
-class MLPMixer(nn.Module):
+class MLPMixer_v2(nn.Module):
     """Character-level isotropic MLP-Mixer."""
 
     def __init__(self, config: Config, num_iter: int = None):
@@ -170,10 +170,11 @@ class MLPMixer(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         x = self.token_embedding(x)
         x = self.position_embedding(x)
-        num_iter = self.num_iter or random.randint(4, 16)
-        counter = torch.linspace(1.0, 0.0, num_iter)
-        for i in range(num_iter):
-            x[:, 0, 0] = counter[i]
+        ####
+        num_iter = self.num_iter or random.randint(1, self.max_num_iter)
+        x = self.time_embedding(x, t=num_iter)
+        for _ in range(num_iter):
             x = self.mixer_blocks(x)
+        ####
         x = self.classifier(x)
         return x
