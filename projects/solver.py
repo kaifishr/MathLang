@@ -1,6 +1,5 @@
 """
-Loads a pre-trained model that can be used as a solver for arithmetic, 
-algebraic or boolean expressions.
+Neural network-based solver for arithmetic, algebraic, and boolean expressions.
 """
 import torch
 from torch.utils.data import Dataset
@@ -21,7 +20,8 @@ from src.dataloader import get_dataloader
 class Solver:
     """Solver class for mathematical expressions.
 
-    Uses a pretrained model solve mathematical expressions.
+    This class loads a pre-trained model that can be used as a solver for 
+    arithmetic, algebraic, and boolean expressions.
 
     Attributes:
         model: An autoregressive model.
@@ -43,9 +43,10 @@ class Solver:
         self.dataset = dataset
         self.config = config
 
-        self.valid_tokens = list(self.dataset.char_to_idx)
-        print(f"{self.valid_tokens = }")
+        self.char_to_idx = self.dataset.char_to_idx
+        self.idx_to_char = self.dataset.idx_to_char
 
+        self.valid_tokens = list(self.char_to_idx)
         self.device = self.config.trainer.device
         self.max_input_length = self.dataset.max_input_length
 
@@ -65,7 +66,7 @@ class Solver:
         """Solves expression."""
 
         # Encode input characters as integer using lookup table from dataloader.
-        data = [self.dataset.char_to_idx[token] for token in expression]
+        data = [self.char_to_idx[token] for token in expression]
 
         # Create input tensor from encoded characters.
         x = torch.tensor(data=data, dtype=torch.long)[None, ...].to(self.device)
@@ -79,7 +80,7 @@ class Solver:
         # Select the most likely tokens.
         indices = torch.argmax(probabilities, dim=-1)
 
-        output = "".join([self.dataset.idx_to_char[int(index)] for index in indices])
+        output = "".join([self.idx_to_char[int(index)] for index in indices])
 
         return output
 
@@ -93,14 +94,13 @@ class Solver:
         ]
 
         for expression in expressions:
-            print(f"{expressions = }")
             print(f"\n>>>\n{expressions}\n")
             if self._is_valid_sequence(sequence=expression):
                 expression = self._add_padding(sequence=expression)
                 print(f"{expression = }")
                 output = self._solve(expression=expression)
-                print(f"{output = }")
-                print(f"\n>>>\n{output}\n")
+                print(f"\n>>> {output}\n")
+                print(f"\n>>> true {eval(expression)}\n")
 
     def run(self):
         """Runs solver."""
@@ -127,8 +127,6 @@ class Solver:
                 expression = self._add_padding(sequence=expression)
                 output = self._solve(expression=expression)
                 print(f"\n['Solver']\n{output}\n")
-
-        print("Bye!")
 
 
 if __name__ == "__main__":
