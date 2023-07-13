@@ -2,8 +2,11 @@
 Neural network-based solver for arithmetic, algebraic, and boolean expressions.
 """
 import torch
-from torch.utils.data import Dataset
 import torch.nn.functional as F
+from torch.utils.data import Dataset
+
+from sympy.parsing.sympy_parser import parse_expr
+from sympy import simplify
 
 from src.config.config import Config
 from src.config.config import init_config
@@ -49,6 +52,8 @@ class Solver:
         self.valid_tokens = list(self.char_to_idx)
         self.device = self.config.trainer.device
         self.max_input_length = self.dataset.max_input_length
+
+        self.task = self.config.dataloader.dataset
 
     def _is_valid_sequence(self, sequence: str) -> bool:
         """Checks if input prompt contains any illegal tokens."""
@@ -100,7 +105,15 @@ class Solver:
                 print(f"{expression = }")
                 output = self._solve(expression=expression)
                 print(f"\n>>> {output}\n")
-                print(f"\n>>> true {eval(expression)}\n")
+                if self.task == "arithmetic":
+                    result = eval(expression)
+                elif self.task == "algebraic":
+                    result = str(parse_expr(result, evaluate=True))
+                    result = simplify(expression)
+                    result = str(result).replace(" ", "")
+                elif self.task == "binary":
+                    result = eval(expression)
+                print(f"\n>>> Ground truth: {result}\n")
 
     def run(self):
         """Runs solver."""
