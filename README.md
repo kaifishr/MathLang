@@ -1,4 +1,5 @@
-# MathNet
+# MathNet 
+###### Teaching neural networks mathematics.
 
 ## Motivation
 
@@ -31,6 +32,7 @@ where the network's task is to compute the scalar result $-14$. Here, Python's `
 ## Research Questions
 
 - Analyze loss, accuracy, entropy, perplexity as a function of network parameters, activations, processed tokens, FLOPS, complexity / lenght of expressions:
+    - Highlight result with underlying uncertainty
 - How does the network perform if it has more time to "think"?
     - Is it possible to "simulate" big networks.
 - How do meta layers perform?
