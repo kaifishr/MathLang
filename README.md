@@ -1,5 +1,4 @@
-# MathNet 
-###### Teaching neural networks mathematics.
+# Teaching Neural Networks Mathematics
 
 ## Motivation
 

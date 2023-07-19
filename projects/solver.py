@@ -66,7 +66,8 @@ class Solver:
     def _add_padding(self, sequence: str) -> str:
         """Pads sequence to correct size."""
         return sequence.ljust(self.max_input_length, " ")
-    
+
+    torch.no_grad() 
     def _solve(self, expression: str) -> str:
         """Solves expression."""
 
@@ -80,14 +81,14 @@ class Solver:
         logits = self.model(x)
 
         # Convert logits to probabilities (not really necessary here)
-        probabilities = F.softmax(input=logits, dim=-1).squeeze()
+        prob = F.softmax(input=logits, dim=-1).squeeze()
+        uncertainty = torch.sum(-torch.log(prob) * prob, dim=-1)
 
         # Select the most likely tokens.
-        indices = torch.argmax(probabilities, dim=-1)
-
+        indices = torch.argmax(prob, dim=-1)
         output = "".join([self.idx_to_char[int(index)] for index in indices])
 
-        return output
+        return output, uncertainty
 
     def test(self):
         """Tests model with some simple prompts."""
@@ -122,8 +123,7 @@ class Solver:
         print("\nPlease enter an expression.\n")
 
         while is_running:
-            print("[User]")
-            expression = input()
+            expression = input(">>> ")
 
             if expression.startswith("!"):
                 command = expression[1:]
@@ -138,8 +138,10 @@ class Solver:
             # Feed expression to model
             if is_running and self._is_valid_sequence(sequence=expression):
                 expression = self._add_padding(sequence=expression)
-                output = self._solve(expression=expression)
-                print(f"\n['Solver']\n{output}\n")
+                outputs, uncertainties = self._solve(expression=expression)
+                for output, uncertainty in zip(outputs, uncertainties):
+                    print(f"{output} ({uncertainty:.4})")
+                # print(f"\n>>> \n{output}\n")
 
 
 if __name__ == "__main__":
