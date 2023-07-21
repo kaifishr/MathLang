@@ -2,7 +2,7 @@
 
 ## Motivation
 
-Arithmetic or algebraic expressions can be generated quickly, at low cost, and with arbitrarily high complexity. Furthermore, they come with short- and long-range dependencies, which makes them useful to train a neural network to learn long-range interactions between tokens in a sequence.
+This projects provides dataloaders for mathematical expressions suitable for machine learning research. Mathematical expressions such as arithmetic, algebraic, or boolean expressions can be generated quickly, at low cost, and with arbitrarily high complexity. Furthermore, they come with short- and long-range dependencies, which makes them useful to train a neural network to learn long-range interactions between tokens in a sequence.
 
 ## Algebraic and Arithmetic Expressions
 
@@ -32,10 +32,7 @@ where the network's task is to compute the scalar result $-14$. Here, Python's `
 
 - Analyze loss, accuracy, entropy, perplexity as a function of network parameters, activations, processed tokens, FLOPS, complexity / lenght of expressions:
     - Highlight result with underlying uncertainty
-- How does the network perform if it has more time to "think"?
-    - Is it possible to "simulate" big networks.
-- How do meta layers perform?
-- Can mathematical expressions used for a pretraining strategy for langauge models?
+- Test meta layers.
 
 ## License
 
