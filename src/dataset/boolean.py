@@ -179,34 +179,27 @@ class BooleanDataset(IterableDataset):
                 expression.append(")")
 
         # Remove whitespaces
-        # expression = "".join(expression)
+        expression = "".join(expression)
 
         return expression
 
     def __iter__(self) -> tuple[torch.Tensor, torch.Tensor]:
+
         while True:
             expression = self._generate_expression()
-            result = str(bool(eval("".join(expression))))
+            result = str(bool(eval(expression)))
+            exit()
 
-            # print(f"{expression = }")
-            # print(f"{result = }")
-            # yield expression, result
+            # TODO: Work here with tokens in a list instad of characters in a string.
 
-            # Add padding so that expressions and results have the same length.
-            print(f"{expression = }")
-            print(f"{len(expression) = }")
+            # Add padding to ensure all inputs have same length. 
             expression += [" "] * (self.max_input_length - len(expression))
             print(f"{expression = }")
             print(f"{len(expression) = }")
-            exit()
             expression = expression.ljust(self.max_input_length, " ")
 
             print(f"{expression = }")
             print(f"{result = }")
-
-            x_encoded = [char for char in expression]
-            print(f"{x_encoded = }")
-            exit()
 
             # Encode expression and result using lookup table.
             x_encoded = [self.char_to_idx[char] for char in expression]
