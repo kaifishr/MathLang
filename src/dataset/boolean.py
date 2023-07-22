@@ -11,7 +11,6 @@ Typical usage example:
         print(f"{x = }")
         print(f"{y = }")
 """
-import collections
 import random
 
 import torch
@@ -121,19 +120,19 @@ class BooleanDataset(IterableDataset):
         """Generates random term."""
         term = random.choice(self.booleans)
         if random.random() < self.p_negate_term:
-            return f"({self.negation[0]} {term})"
-        return f"({term})"
+            return ["(", self.negation[0], " ", term, ")"]
+        return ["(", term, ")"]
 
     def _generate_boolean_term(self) -> str:
         """Generates random term of random length."""
         term = self._get_boolean_term()
         if random.random() < self.p_second_term:
-            term2 = self._get_boolean_term()
+            term_2 = self._get_boolean_term()
             operator = random.choice(self.operators)
             if random.random() < self.p_negate_term:
-                return f"({self.negation[0]}({term}{operator}{term2}))"
-            return f"({term}{operator}{term2})"
-        return f"({term})"
+                return ["(", self.negation[0], "(", *term, operator, *term_2, ")", ")"]
+            return ["(", *term, operator, *term_2, ")"]
+        return ["(", *term, ")"]
 
     def _generate_relational_term(self) -> str:
         """Generates random relational term of random length."""
@@ -141,12 +140,12 @@ class BooleanDataset(IterableDataset):
         if random.random() < self.p_second_term:
             term_2 = random.choice(self.scalars)
             operator = random.choice(self.relational)
-            return f"({term}{operator}{term_2})"
-        return f"({term})"
+            return ["(", term, operator, term_2, ")"]
+        return ["(", term, ")"]
 
     def _generate_expression(self) -> str:
         """Generates random algebraic expression."""
-        expression = collections.deque()
+        expression = []
 
         # Append initial term.
         if random.random() < self.p_boolean_term:
@@ -154,7 +153,7 @@ class BooleanDataset(IterableDataset):
         else:
             term = self._generate_relational_term()
 
-        expression.append(term)
+        expression.extend(term)
 
         for _ in range(self.num_terms - 1):
 
@@ -167,43 +166,35 @@ class BooleanDataset(IterableDataset):
 
             # Append term randomly either right or left.
             if random.random() < self.p_append_right:
-                term = f"{operator}{term}"
-                expression.append(term)
+                term = [operator, *term]
+                expression = expression + term
             else:
-                term = f"{term}{operator}"
-                expression.appendleft(term)
+                term = [*term, operator]
+                expression = term + expression
 
             # Whether or not to set brackets.
             if random.random() < self.p_set_brackets:
-                expression.appendleft("(")
-                expression.append(")")
-
-        # Remove whitespaces
-        expression = "".join(expression)
+                expression = ["("] + expression
+                expression = expression + [")"]
 
         return expression
 
     def __iter__(self) -> tuple[torch.Tensor, torch.Tensor]:
 
         while True:
-            expression = self._generate_expression()
-            result = str(bool(eval(expression)))
-            exit()
 
-            # TODO: Work here with tokens in a list instad of characters in a string.
+            expression = self._generate_expression()
+            result = bool(eval("".join(expression)))
 
             # Add padding to ensure all inputs have same length. 
-            expression += [" "] * (self.max_input_length - len(expression))
-            print(f"{expression = }")
-            print(f"{len(expression) = }")
-            expression = expression.ljust(self.max_input_length, " ")
-
-            print(f"{expression = }")
-            print(f"{result = }")
+            # expression += [" "] * (self.max_input_length - len(expression))
+            expression += [" "] * (100 - len(expression))
+            exit("TODO: Compute correct max_input_length")
 
             # Encode expression and result using lookup table.
             x_encoded = [self.char_to_idx[char] for char in expression]
-            y_encoded = [self.char_to_idx[char] for char in result]
+            y_encoded = 1 if result else 0
+
             x_data = torch.tensor(data=x_encoded, dtype=torch.long)
             y_data = torch.tensor(data=y_encoded, dtype=torch.long)
 
@@ -214,7 +205,7 @@ def main():
     torch.manual_seed(42)
     random.seed(42)
 
-    dataset = BooleanDataset(num_terms=4)
+    dataset = BooleanDataset(num_terms=8)
     dataloader = DataLoader(dataset, batch_size=2, num_workers=0)
     for i, (x, y) in enumerate(dataloader):
         print(f"{x = }")
