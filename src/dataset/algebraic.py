@@ -181,6 +181,7 @@ class AlgebraicDataset(IterableDataset):
 
     def __iter__(self) -> tuple[torch.Tensor, torch.Tensor]:
         while True:
+            # TODO: Reject expression if longer than max_input_length
             expression = self.generate_expression()
             result = str(parse_expr(expression, evaluate=True))
             if self.use_simplify:

@@ -30,7 +30,7 @@ where the network's task is to compute the scalar result $-14$. Here, Python's `
 
 ## Research Questions
 
-- Analyze loss, accuracy, entropy, perplexity as a function of network parameters, activations, processed tokens, FLOPS, complexity / lenght of expressions:
+- Analyze loss, accuracy, entropy as a function of network parameters, activations, processed tokens, FLOPS, complexity / lenght of expressions:
     - Highlight result with underlying uncertainty
 - Test meta layers.
 
