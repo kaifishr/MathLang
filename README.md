@@ -18,7 +18,7 @@ $$
 ((3 \cdot x-6 \cdot z)-((x-1)-((1 \cdot y-(((7+x)+(8-z))-5 \cdot y))+1)-z))
 $$
 
-For the expression above, the network's task would be to compute a simplified version of the expression that is $x+6*y-4*z-13$. The simplification is performed using *SymPy*'s `simplify()` method. Note that `simplify()` also sorts the variables and adds the scalar term at the end of the simplified expression.
+For the expression above, the network's task would be to compute a simplified version of the expression that is $x+6 \cdot y-4 \cdot z-13$. The simplification is performed using *SymPy*'s `simplify()` method. Note that `simplify()` also sorts the variables and adds the scalar term at the end of the simplified expression.
 
 Alebraic expressions are a superset of arithmetic expressions such as
 
@@ -31,7 +31,7 @@ where the network's task is to compute the scalar result $-14$. Here, Python's `
 Boolean expressions are composed of Boolean values, either `True` or `False`, or comparison operations, and logical connections that produce a Boolean value when evaluated. Here again, Python's built-in `eval()` method is used to evaluate the Boolean expression.
 
 $$
-((((4)\&\&(8>3)||((0>5)\&\&(((\text{False}))||((!\text{False}))))\&\&(1))\&\&(9<=2))\&\&((!\text{True}))) = \text{False}
+((((4)\text{\&\&}(8>3)||((0>5)\text{\&\&}(((\text{False}))||((!\text{False}))))\text{\&\&}(1))\text{\&\&}(9<=2))\text{\&\&}((!\text{True}))) = \text{False}
 $$
 
 ## Research Questions
