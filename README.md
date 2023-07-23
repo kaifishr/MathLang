@@ -1,8 +1,8 @@
-# Teaching Neural Networks Mathematics
+# MathLang 
 
 ## Motivation
 
-This projects provides dataloaders for mathematical expressions suitable for machine learning research. Mathematical expressions such as arithmetic, algebraic, or boolean expressions can be generated fast, at low cost, and with arbitrarily high complexity. Furthermore, these expressions come with short- and long-range dependencies, which makes them useful to train a neural network to learn these interactions between tokens in a sequence.
+This projects provides dataloaders for mathematical expressions suitable for machine learning research. Mathematical expressions such as arithmetic, algebraic, or boolean expressions can be generated fast, at low cost, and with arbitrarily high complexity. Furthermore, these expressions come with short- and long-range dependencies, which makes them useful to train a neural network to learn interactions between tokens in a sequence.
 
 ## Algebraic and Arithmetic Expressions
 
@@ -33,12 +33,6 @@ Boolean expressions are composed of Boolean values, either `True` or `False`, or
 $$
 ((((4)\wedge(8>3)\vee((0>5)\wedge(((\text{False}))\vee((!\text{False}))))\wedge(1))\wedge(9<=2))\wedge((!\text{True}))) = \text{False}
 $$
-
-## Research Questions
-
-- Analyze loss, accuracy, entropy as a function of network parameters, activations, processed tokens, FLOPS, complexity / lenght of expressions:
-    - Highlight result with underlying uncertainty
-- Test meta layers.
 
 ## License
 

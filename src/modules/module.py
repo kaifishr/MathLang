@@ -307,10 +307,10 @@ class MlpBlock(nn.Module):
         hidden_dim = expansion_factor * dim
 
         self.mlp_block = nn.Sequential(
-            # MetaLinear(in_features=dim, out_features=hidden_dim),
-            # MetaLinear(in_features=hidden_dim, out_features=dim),
-            nn.Linear(in_features=dim, out_features=hidden_dim),
-            nn.Linear(in_features=hidden_dim, out_features=dim),
+            MetaLinear(in_features=dim, out_features=hidden_dim),
+            MetaLinear(in_features=hidden_dim, out_features=dim),
+            # nn.Linear(in_features=dim, out_features=hidden_dim),
+            # nn.Linear(in_features=hidden_dim, out_features=dim),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
