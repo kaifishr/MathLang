@@ -151,7 +151,6 @@ class BooleanDataset(IterableDataset):
         expression.extend(term)
 
         for _ in range(self.num_terms - 1):
-
             if random.random() < self.p_boolean_term:
                 term = self._generate_boolean_term()
             else:
@@ -175,13 +174,11 @@ class BooleanDataset(IterableDataset):
         return expression
 
     def __iter__(self) -> tuple[torch.Tensor, torch.Tensor]:
-
         while True:
-
             expression = self._generate_expression()
             result = bool(eval("".join(expression)))
 
-            # Add padding to ensure all inputs have same length. 
+            # Add padding to ensure all inputs have same length.
             expression += [" "] * (self.max_input_length - len(expression))
 
             # Encode expression and result using lookup table.

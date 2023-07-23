@@ -41,6 +41,7 @@ class ArithmeticDataset(IterableDataset):
         max_input_length:
         max_output_length:
     """
+
     max_number = 9
     operator_set = ["+", "-"]
 
@@ -56,7 +57,7 @@ class ArithmeticDataset(IterableDataset):
         """Initializes the arithmetic dataset based on provided parameters.
 
         Args:
-            num_terms: An integer defining the number of iterations to create 
+            num_terms: An integer defining the number of iterations to create
                 arithmetic expression.
         """
         super().__init__()

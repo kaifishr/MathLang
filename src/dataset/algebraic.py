@@ -71,12 +71,7 @@ class AlgebraicDataset(IterableDataset):
         # List of all characters used for expressions is comprised of scalar
         # values, variables, operators, brackets, and blank spaces for padding.
         chars = (
-            self.scalars 
-            + self.operators 
-            + self.variables 
-            + ["*"] 
-            + ["(", ")"] 
-            + [" "]
+            self.scalars + self.operators + self.variables + ["*"] + ["(", ")"] + [" "]
         )
 
         # Lookup table for character-index-translation.

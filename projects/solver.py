@@ -23,7 +23,7 @@ from src.dataloader import get_dataloader
 class Solver:
     """Solver class for mathematical expressions.
 
-    This class loads a pre-trained model that can be used as a solver for 
+    This class loads a pre-trained model that can be used as a solver for
     arithmetic, algebraic, and boolean expressions.
 
     Attributes:
@@ -67,7 +67,8 @@ class Solver:
         """Pads sequence to correct size."""
         return sequence.ljust(self.max_input_length, " ")
 
-    torch.no_grad() 
+    torch.no_grad()
+
     def _solve(self, expression: str) -> str:
         """Solves expression."""
 
