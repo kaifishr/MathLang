@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 from src.config.config import Config
 from src.dataset import ArithmeticDataset
 from src.dataset import AlgebraicDataset
+from src.dataset import BooleanDataset
 
 
 def seed_worker(worker_id):
@@ -18,18 +19,17 @@ def seed_worker(worker_id):
 def get_dataloader(config: Config) -> DataLoader:
     """Creates dataloader for specified dataset."""
 
-    dataset = config.dataloader.dataset
+    dataset = config.dataset.dataset
+    num_terms = config.dataset.num_terms
     num_workers = config.dataloader.num_workers
     batch_size = config.trainer.batch_size
 
     if dataset == "arithmetic":
-        train_dataset = ArithmeticDataset()
-
+        train_dataset = ArithmeticDataset(num_terms=num_terms)
     elif dataset == "algebraic":
-        train_dataset = AlgebraicDataset()
-
+        train_dataset = AlgebraicDataset(num_terms=num_terms)
     elif dataset == "boolean":
-        raise NotImplementedError(f"Dataloader for {dataset} not implemented.")
+        train_dataset = BooleanDataset(num_terms=num_terms)
     else:
         raise NotImplementedError(f"Dataloader for {dataset} not implemented.")
 

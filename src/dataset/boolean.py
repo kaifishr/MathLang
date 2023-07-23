@@ -30,13 +30,13 @@ class BooleanDataset(IterableDataset):
     "9*b-((d+b)-a+0*b)+(a-d)" with the result "2*a+8*b-2*d".
 
     Attributes:
-        num_terms: Integer defining number of terms of algebraic expression.
-        use_simplify: Boolean. If true, algebraic expression is being
-            additionally simplified.
-        ooperators: List of operators used to build algebraic expression.
-        variables: List of variables used to build algebraic expression.
+        num_terms: Integer defining number of terms of expression.
         scalars: List of scalars used to build algebraic expression.
-        chars:
+        relational: List of relational relational operators.
+        operators: List of boolean operators.
+        booleans: List of boolean variables.
+        negation: The negation operator.
+        tokens: List of tokens.
         char_to_idx:
         idx_to_char:
     """
@@ -67,7 +67,7 @@ class BooleanDataset(IterableDataset):
         # List of all characters used for expressions is comprised of scalars,
         # relational operators, booleans operators, brackets, and blank spaces
         # for padding.
-        chars = (
+        tokens = (
             self.scalars
             + self.relational
             + self.operators
@@ -78,14 +78,14 @@ class BooleanDataset(IterableDataset):
         )
 
         # Lookup table for character-index-translation.
-        self.char_to_idx = {char: idx for idx, char in enumerate(chars)}
-        self.idx_to_char = {idx: char for idx, char in enumerate(chars)}
+        self.char_to_idx = {token: idx for idx, token in enumerate(tokens)}
+        self.idx_to_char = {idx: token for idx, token in enumerate(tokens)}
         self.num_tokens = len(self.char_to_idx)
         print(f"{self.char_to_idx =}")
         print(f"{self.idx_to_char =}")
 
         self.max_input_length = self._comp_max_input_length()
-        self.max_output_length = 2  # True or False
+        self.max_output_length = 1  # True or False
 
         print(f"Maximum input sequence lenght: {self.max_input_length}")
         print(f"Maximum output sequence lenght: {self.max_output_length}")
@@ -93,34 +93,28 @@ class BooleanDataset(IterableDataset):
     def _comp_max_input_length(self) -> int:
         """Computes maximum input lenght for padding.
 
+        Computes an upper bound based on the maximum length of an atomic term:
+            (not((not bool)operator(not bool))) e.g., (!((!0)&(!1)))
+
         Returns:
             Integer representing maximum length of input sequence.
         """
-
-        # Compute maximum length of atomic term
-
-        # Total lenght of opening and closing brackets.
+        n_max_term_atomic = 16  # (not((not bool)operator(not bool)))
         n_brackets = 2
-        # Total length of operators.
-        n_operators = 1
-        # Total length of characters used to display scalars.
-        n_scalars = 2 * len(str(self.max_number))
-
-        n_max_term = n_brackets + n_operators + n_scalars
-
-        # Operators used to concatenate terms.
         n_concat_operators = 1
 
-        max_len_input = n_max_term + (self.num_terms - 1) * (
-            n_max_term + n_concat_operators + n_brackets
+        max_len_input = n_max_term_atomic + (self.num_terms - 1) * (
+            n_max_term_atomic + n_concat_operators + n_brackets
         )
+
         return max_len_input
 
     def _get_boolean_term(self) -> str:
         """Generates random term."""
         term = random.choice(self.booleans)
         if random.random() < self.p_negate_term:
-            return ["(", self.negation[0], " ", term, ")"]
+            negation = self.negation[0]
+            return ["(", negation, " ", term, ")"]
         return ["(", term, ")"]
 
     def _generate_boolean_term(self) -> str:
@@ -130,7 +124,8 @@ class BooleanDataset(IterableDataset):
             term_2 = self._get_boolean_term()
             operator = random.choice(self.operators)
             if random.random() < self.p_negate_term:
-                return ["(", self.negation[0], "(", *term, operator, *term_2, ")", ")"]
+                negation = self.negation[0]
+                return ["(", negation, "(", *term, operator, *term_2, ")", ")"]
             return ["(", *term, operator, *term_2, ")"]
         return ["(", *term, ")"]
 
@@ -187,13 +182,11 @@ class BooleanDataset(IterableDataset):
             result = bool(eval("".join(expression)))
 
             # Add padding to ensure all inputs have same length. 
-            # expression += [" "] * (self.max_input_length - len(expression))
-            expression += [" "] * (100 - len(expression))
-            exit("TODO: Compute correct max_input_length")
+            expression += [" "] * (self.max_input_length - len(expression))
 
             # Encode expression and result using lookup table.
             x_encoded = [self.char_to_idx[char] for char in expression]
-            y_encoded = 1 if result else 0
+            y_encoded = [1 if result else 0]
 
             x_data = torch.tensor(data=x_encoded, dtype=torch.long)
             y_data = torch.tensor(data=y_encoded, dtype=torch.long)
@@ -206,10 +199,10 @@ def main():
     random.seed(42)
 
     dataset = BooleanDataset(num_terms=8)
-    dataloader = DataLoader(dataset, batch_size=2, num_workers=0)
+    dataloader = DataLoader(dataset, batch_size=256, num_workers=2)
     for i, (x, y) in enumerate(dataloader):
-        print(f"{x = }")
-        print(f"{y = }")
+        print(f"{x.shape = }")
+        print(f"{y.shape = }")
         if i == 10:
             break
 

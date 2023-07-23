@@ -42,7 +42,7 @@ class Trainer:
         self.num_update_steps = config.trainer.num_update_steps
 
         runs_dir = config.dirs.runs
-        dataset = config.dataloader.dataset
+        dataset = config.dataset.dataset
 
         uid = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S.%f")
         tag = config.tag
@@ -160,7 +160,7 @@ class Trainer:
 
         if config.summary.save_model.every_n_updates > 0:
             if update_step % config.summary.save_model.every_n_updates == 0:
-                dataset = config.dataloader.dataset
+                dataset = config.dataset.dataset
                 tag = f"_{config.tag}" if config.tag else ""
                 model_name = f"{dataset}{tag}.pth"
                 model_path = os.path.join(config.dirs.weights, model_name)

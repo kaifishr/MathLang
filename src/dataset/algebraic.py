@@ -51,10 +51,10 @@ class AlgebraicDataset(IterableDataset):
 
     # These probabilities determine properties of expressions.
     p_scalar_term = 0.5
-    p_scalar_multiplier = 0.5
     p_second_term = 0.5
     p_set_brackets = 0.5
-    p_append_right_or_left = 0.5
+    p_append_right = 0.5
+    p_scalar_multiplier = 0.5
 
     def __init__(
         self,
@@ -71,7 +71,12 @@ class AlgebraicDataset(IterableDataset):
         # List of all characters used for expressions is comprised of scalar
         # values, variables, operators, brackets, and blank spaces for padding.
         chars = (
-            self.scalars + self.operators + self.variables + ["*"] + ["(", ")"] + [" "]
+            self.scalars 
+            + self.operators 
+            + self.variables 
+            + ["*"] 
+            + ["(", ")"] 
+            + [" "]
         )
 
         # Lookup table for character-index-translation.
@@ -162,7 +167,7 @@ class AlgebraicDataset(IterableDataset):
             operator = random.choice(self.operators)
 
             # Append term randomly either right or left.
-            if random.random() < self.p_append_right_or_left:
+            if random.random() < self.p_append_right:
                 term = f"{operator}{term}"
                 expression.append(term)
             else:

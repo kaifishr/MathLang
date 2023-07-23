@@ -41,14 +41,13 @@ class ArithmeticDataset(IterableDataset):
         max_input_length:
         max_output_length:
     """
-
     max_number = 9
     operator_set = ["+", "-"]
 
     # These probabilities determine properties of expressions.
     p_second_term = 0.5
     p_set_brackets = 0.5
-    p_append_right_or_left = 0.5
+    p_append_right = 0.5
 
     def __init__(
         self,
@@ -57,7 +56,8 @@ class ArithmeticDataset(IterableDataset):
         """Initializes the arithmetic dataset based on provided parameters.
 
         Args:
-            num_terms: An integer defining the number of iterations to create arithmetic expression.
+            num_terms: An integer defining the number of iterations to create 
+                arithmetic expression.
         """
         super().__init__()
 
@@ -130,7 +130,7 @@ class ArithmeticDataset(IterableDataset):
             term = f"({term}{operator}{term2})"
         return term
 
-    def generate_expression(self) -> tuple[torch.Tensor, torch.Tensor]:
+    def _generate_expression(self) -> tuple[torch.Tensor, torch.Tensor]:
         """Generates random arithmetic expression."""
         expression = collections.deque()
         expression.append(self._get_term())
@@ -140,7 +140,7 @@ class ArithmeticDataset(IterableDataset):
             operator = random.choice(self.operators)
 
             # Append term randomly either right or left.
-            if random.random() < self.p_append_right_or_left:
+            if random.random() < self.p_append_right:
                 term = f"{operator}{term}"
                 expression.append(term)
             else:
@@ -159,7 +159,7 @@ class ArithmeticDataset(IterableDataset):
 
     def __iter__(self) -> tuple[torch.Tensor, torch.Tensor]:
         while True:
-            expression = self.generate_expression()
+            expression = self._generate_expression()
             result = str(eval(expression))
 
             # Add padding so that expressions and results have the same length.

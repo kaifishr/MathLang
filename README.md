@@ -28,6 +28,12 @@ $$
 
 where the network's task is to compute the scalar result $-14$. Here, Python's `eval()` method is used to solve the expression. For the sake of simplicity, only operators for addition, subtraction, and multiplication are used for the generation of expressions.
 
+Boolean expressions are composed of Boolean values, either `True` or `False`, or comparison operations, and logical connections that produce a Boolean value when evaluated. Here again, Python's built-in `eval()` method is used to evaluate the Boolean expression.
+
+$$
+((((4)\&\&(8>3)||((0>5)\&\&(((\text{False}))||((!\text{False}))))\&\&(1))\&\&(9<=2))\&\&((!\text{True}))) = \text{False}
+$$
+
 ## Research Questions
 
 - Analyze loss, accuracy, entropy as a function of network parameters, activations, processed tokens, FLOPS, complexity / lenght of expressions:
