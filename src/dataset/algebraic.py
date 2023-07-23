@@ -71,13 +71,22 @@ class AlgebraicDataset(IterableDataset):
         # List of all characters used for expressions is comprised of scalar
         # values, variables, operators, brackets, and blank spaces for padding.
         chars = (
-            self.scalars + self.operators + self.variables + ["*"] + ["(", ")"] + [" "]
+            self.scalars 
+            + self.operators 
+            + self.variables 
+            + ["*"] 
+            + ["(", ")"] 
+            + [" "]
         )
 
         # Lookup table for character-index-translation.
         self.char_to_idx = {char: idx for idx, char in enumerate(chars)}
         self.idx_to_char = {idx: char for idx, char in enumerate(chars)}
         self.num_tokens = len(self.char_to_idx)
+
+        # TODO: Use this instead of 'num_tokens'
+        self.num_input_tokens = len(self.char_to_idx)
+        self.num_output_tokens = self.num_input_tokens
 
         self.max_input_length = self._comp_max_input_length()
         self.max_output_length = self._comp_max_output_length()
@@ -211,7 +220,7 @@ def main():
     for i, (x, y) in enumerate(dataloader):
         print(f"{x = }")
         print(f"{y = }")
-        if i == 3:
+        if i == 4:
             break
 
 

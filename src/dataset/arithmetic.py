@@ -75,6 +75,10 @@ class ArithmeticDataset(IterableDataset):
         self.idx_to_char = {idx: char for idx, char in enumerate(chars)}
         self.num_tokens = len(self.char_to_idx)
 
+        # TODO: Use this instead of 'num_tokens'
+        self.num_input_tokens = len(self.char_to_idx)
+        self.num_output_tokens = len(self.scalars)
+
         self.max_input_length = self._comp_max_input_length()
         self.max_output_length = self._comp_max_output_length()
 
@@ -180,15 +184,13 @@ def main():
     torch.manual_seed(42)
     random.seed(42)
 
-    dataset = ArithmeticDataset(
-        num_terms=8,
-    )
+    dataset = ArithmeticDataset(num_terms=8)
     dataloader = DataLoader(dataset, batch_size=2, num_workers=2)
 
     for i, (x, y) in enumerate(dataloader):
         print(f"{x.shape = }")
         print(f"{y = }")
-        if i == 2:
+        if i == 4:
             break
 
 

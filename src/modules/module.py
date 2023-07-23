@@ -25,7 +25,7 @@ class TokenEmbedding(nn.Module):
         """Initializes PositionalEmbedding."""
         super().__init__()
 
-        num_tokens = config.data.num_tokens
+        num_tokens = config.data.num_input_tokens
         model_type = config.model.type
         embedding_dim = config.model.embedding_dim
 
@@ -470,7 +470,7 @@ class Classifier(nn.Module):
         input_sequence_length = config.model.input_sequence_length
         output_sequence_length = config.model.output_sequence_length
         embedding_dim = config.model.embedding_dim
-        num_classes = config.data.num_tokens
+        num_classes = config.data.num_output_tokens
 
         self.classifier = nn.Sequential(
             nn.LayerNorm(embedding_dim),
@@ -496,7 +496,7 @@ class ConvClassifier(nn.Module):
         output_sequence_length = config.model.output_sequence_length
         embedding_dim = config.model.embedding_dim
         kernel_size = config.model.kernel_size
-        num_classes = config.data.num_tokens
+        num_classes = config.data.num_output_tokens
 
         self.classifier = nn.Sequential(
             nn.Conv2d(

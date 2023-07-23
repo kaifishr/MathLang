@@ -81,8 +81,10 @@ class BooleanDataset(IterableDataset):
         self.char_to_idx = {token: idx for idx, token in enumerate(tokens)}
         self.idx_to_char = {idx: token for idx, token in enumerate(tokens)}
         self.num_tokens = len(self.char_to_idx)
-        print(f"{self.char_to_idx =}")
-        print(f"{self.idx_to_char =}")
+
+        # TODO: Use this instead of 'num_tokens'
+        self.num_input_tokens = len(self.char_to_idx)
+        self.num_output_tokens = len(self.booleans)
 
         self.max_input_length = self._comp_max_input_length()
         self.max_output_length = 1  # True or False
@@ -200,7 +202,7 @@ def main():
     for i, (x, y) in enumerate(dataloader):
         print(f"{x.shape = }")
         print(f"{y.shape = }")
-        if i == 10:
+        if i == 4:
             break
 
 
