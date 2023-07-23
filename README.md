@@ -31,6 +31,14 @@ where the network's task is to compute the scalar result $-14$. Here, Python's `
 Boolean expressions are composed of Boolean values, either `True` or `False`, or comparison operations, and logical connections that produce a Boolean value when evaluated. Here again, Python's built-in `eval()` method is used to evaluate the Boolean expression.
 
 $$
+\&
+$$
+
+$$
+\text{\&}
+$$
+
+$$
 ((((4)\text{ \& }(8>3)||((0>5)\text{\&\&}(((\text{False}))||((!\text{False}))))\text{\&\&}(1))\text{\&\&}(9<=2))\text{\&\&}((!\text{True}))) = \text{False}
 $$
 
