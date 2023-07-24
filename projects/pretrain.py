@@ -3,9 +3,6 @@
 Uses mathematical expressions for pre-training followed by training on natural
 language.
 
-NOTE:
-    - Core model functions as backbone.
-    - Build new model with backbone and train it.
 """
 import torch
 
@@ -17,7 +14,6 @@ from src.tester import Tester
 from src.trainer.trainer import Trainer
 from src.utils.tools import set_random_seed
 from src.utils.tools import load_checkpoint
-from src.utils.tools import save_checkpoint
 
 
 def run_training_math(config: Config):
@@ -46,6 +42,7 @@ def run_training_math(config: Config):
 
 
 def run_training_lang(config: Config):
+    """Runs training on text dataset."""
 
     dataloader = get_dataloader(config=config)
 
@@ -88,13 +85,13 @@ def run_experiment():
     # Define pre-training dataset.
     config.dataset.dataset = "boolean"
 
-    # Run pre-training.
+    # Run pre-training on mathematical expression.
     run_training_math(config=config)
 
     # Define training dataset.
     config.dataset.dataset = "tinystories"
 
-    # Run pre-training.
+    # Run training on natural language.
     run_training_lang(config=config)
 
 
