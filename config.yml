@@ -21,7 +21,9 @@ dataset:
 #########
 model:
   # type: convmixer, mlpmixer, cnn, transformer
-  type: "convmixer"
+  type: "transformer"
+  input_sequence_length: 128
+  output_sequence_length: 8
   num_blocks: 4
   embedding_dim: 16
   expansion_factor: 1  # MLP-Mixer / Transformer
