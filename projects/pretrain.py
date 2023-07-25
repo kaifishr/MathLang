@@ -25,6 +25,7 @@ def run_training_math(config: Config):
     # maximum size of mathematical expression.
     input_sequence_length = config.model.input_sequence_length
     max_input_length = dataloader.dataset.max_input_length
+    print(f"{max_input_length = }")
     assert input_sequence_length >= max_input_length, (
         f"'input_sequence_length' must be larger than 'max_input_length' of" \
         f"'train_dataset'"
@@ -45,8 +46,12 @@ def run_training_lang(config: Config):
     """Runs training on text dataset."""
 
     dataloader = get_dataloader(config=config)
-
     model = build_model(config=config)
+
+    ckpt_dir = config.dirs.weights
+    model_name = config.load_model.model_name
+    load_checkpoint(model=model, ckpt_dir=ckpt_dir, model_name=model_name)
+
     model.to(config.trainer.device)
 
     print(config)
@@ -84,12 +89,14 @@ def run_experiment():
 
     # Define pre-training dataset.
     config.dataset.dataset = "boolean"
+    config.load_model.model_name = config.dataset.dataset
 
     # Run pre-training on mathematical expression.
     run_training_math(config=config)
 
     # Define training dataset.
     config.dataset.dataset = "tinystories"
+    config.model.output_sequence_length = 1
 
     # Run training on natural language.
     run_training_lang(config=config)
