@@ -59,7 +59,10 @@ class Trainer:
         # Add graph of model to Tensorboard.
         if config.summary.add_graph:
             add_graph(
-                model=model, dataloader=dataloader, writer=self.writer, config=config
+                model=model, 
+                dataloader=dataloader, 
+                writer=self.writer, 
+                config=config
             )
 
         learning_rate = config.trainer.learning_rate

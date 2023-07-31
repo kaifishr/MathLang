@@ -102,7 +102,7 @@ def run_experiment():
     config = init_config(file_path="config.yml")
 
     # Define pre-training dataset.
-    config.trainer.num_update_steps = 0
+    config.trainer.num_update_steps = 1000
     config.dataset.dataset = "arithmetic"
     config.load_model.model_name = config.dataset.dataset
 
@@ -110,7 +110,7 @@ def run_experiment():
     math_model = run_training_math(config=config)
 
     # Define training dataset.
-    config.trainer.num_update_steps = 10000
+    config.trainer.num_update_steps = 1000
     config.dataset.dataset = "tinystories"
     config.model.output_sequence_length = 1
 

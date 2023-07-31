@@ -14,7 +14,7 @@ dataset:
   # "arithmetic", "algebraic", "boolean" 
   dataset: "arithmetic"
   # Define length of expression.
-  num_terms: 4
+  num_terms: 8
 
 #########
 # Model #
@@ -25,7 +25,7 @@ model:
   input_sequence_length: 196
   output_sequence_length: -1
   num_blocks: 4
-  embedding_dim: 16
+  embedding_dim: 64
   expansion_factor: 1  # MLP-Mixer / Transformer
   kernel_size: 3       # ConvMixer / CNN
   dropout_prob: 0
@@ -46,7 +46,7 @@ model:
 trainer:
   # gpu, cpu
   device: "gpu"
-  num_update_steps: 1
+  num_update_steps: 10000
   batch_size: 64
   learning_rate: 1.0e-4
   weight_decay: 0
