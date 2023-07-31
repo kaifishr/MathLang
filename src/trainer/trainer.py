@@ -91,6 +91,12 @@ class Trainer:
         update_step = 0
 
         for x_data, y_data in self.dataloader:
+
+            if update_step == self.num_update_steps:
+                break
+
+            update_step += 1
+
             # Get the inputs and labels.
             inputs, labels = x_data.to(device), y_data.to(device)
 
@@ -127,10 +133,6 @@ class Trainer:
 
             self._train_summary(writer=writer, update_step=update_step)
             self._write_summary(writer=writer, model=model, update_step=update_step)
-
-            update_step += 1
-            if update_step == self.num_update_steps:
-                break
 
         num_update_steps = config.trainer.num_update_steps
         self._write_summary(model=model, writer=writer, update_step=num_update_steps)
