@@ -454,7 +454,8 @@ class ConvMixerBlock(nn.Module):
         super().__init__()
 
         self.conv_mixer_block = nn.Sequential(
-            DepthwiseConvolution(config=config), PointwiseConvolution(config=config)
+            DepthwiseConvolution(config=config), 
+            PointwiseConvolution(config=config)
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -476,7 +477,8 @@ class Classifier(nn.Module):
             nn.LayerNorm(embedding_dim),
             SwapAxes(axis0=-2, axis1=-1),
             nn.Linear(
-                in_features=input_sequence_length, out_features=output_sequence_length
+                in_features=input_sequence_length, 
+                out_features=output_sequence_length
             ),
             SwapAxes(axis0=-2, axis1=-1),
             nn.Linear(in_features=embedding_dim, out_features=num_classes),

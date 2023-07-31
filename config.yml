@@ -5,7 +5,7 @@ random_seed: 42
 # Dataloader #
 ##############
 dataloader:
-  num_workers: 2
+  num_workers: 0
 
 ###########
 # Dataset #
@@ -14,7 +14,7 @@ dataset:
   # "arithmetic", "algebraic", "boolean" 
   dataset: "arithmetic"
   # Define length of expression.
-  num_terms: 8
+  num_terms: 4
 
 #########
 # Model #
@@ -48,7 +48,7 @@ trainer:
   device: "gpu"
   num_update_steps: 1
   batch_size: 64
-  learning_rate: 3.0e-4
+  learning_rate: 1.0e-4
   weight_decay: 0
   gradient_clipping:
     is_activated: false

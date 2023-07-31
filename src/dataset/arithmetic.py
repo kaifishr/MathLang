@@ -77,7 +77,8 @@ class ArithmeticDataset(IterableDataset):
 
         # TODO: Use this instead of 'num_tokens'
         self.num_input_tokens = len(self.char_to_idx)
-        self.num_output_tokens = len(self.scalars)
+        # TODO: Use only possible output tokens: len(self.scalars + "-" + " ")
+        self.num_output_tokens = len(self.char_to_idx) 
 
         self.max_input_length = self._comp_max_input_length()
         self.max_output_length = self._comp_max_output_length()

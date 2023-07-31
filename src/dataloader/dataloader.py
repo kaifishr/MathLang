@@ -61,8 +61,8 @@ def get_dataloader(config: Config) -> DataLoader:
         config.model.output_sequence_length = output_sequence_length
 
     if dataset == "tinystories":
-        config.data.num_tokens = train_dataset.num_tokens
-        config.data.num_classes = train_dataset.num_tokens
+        config.data.num_input_tokens = train_dataset.num_tokens
+        config.data.num_output_tokens = train_dataset.num_tokens
     else:
         config.data.num_input_tokens = train_dataset.num_input_tokens
         config.data.num_output_tokens = train_dataset.num_output_tokens
