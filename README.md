@@ -1,4 +1,6 @@
-# MathLang 
+# MathLang
+
+TL;DR: *Pre-pre-training language models with mathematical expressions as a cheap way to improve the performance of large language models.*
 
 ## Motivation
 
@@ -33,6 +35,14 @@ $$
 $$
 
 The ease of generating arbitrary complex mathematical expressions combined with their numerous interesting properties makes them an interesting choice for experiments wherever capabilities of networks are to be compared, novel network architectures tested, or for pre-training. Recent advances in natual language processing show, specifically the paper [Textbooks Are All You Need](https://arxiv.org/abs/2306.11644) with their *phi-1* model, some remarkable results from using syntethic data.
+
+## Experiment
+
+The following graph shows the loss of a transformer neural network trained on [TinyStories](https://arxiv.org/abs/2305.07759) without and with pre-training on arithmetic expressions for 1e5 iterations. First results show, that pre-training on mathematical expressions allows the model to converge faster and to achieve a lower loss.
+
+<p align="center">
+  <img width="" height="400" src="./docs/pretraining.png">
+</p>
 
 ## Citation
 
