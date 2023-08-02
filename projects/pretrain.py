@@ -65,7 +65,7 @@ def run_training_lang(math_model: torch.nn.Module, config: Config):
     print("Training finished.")
 
 
-def run_experiment():
+def run_experiment(num_steps_math: int, num_steps_lang: int = 100000) -> None:
     # Seed random number generator.
     set_random_seed(seed=0)
 
@@ -73,15 +73,18 @@ def run_experiment():
     config = init_config(file_path="config.yml")
 
     # Define pre-training dataset.
-    config.trainer.num_update_steps = 20000
+    config.trainer.num_update_steps = num_steps_math 
     config.dataset.dataset = "arithmetic"
     config.load_model.model_name = config.dataset.dataset
 
     # Run pre-training on mathematical expression.
     math_model = run_training_math(config=config)
 
+    # Seed random number generator.
+    set_random_seed(seed=0)
+
     # Define training dataset.
-    config.trainer.num_update_steps = 20000
+    config.trainer.num_update_steps = num_steps_lang 
     config.dataset.dataset = "tinystories"
     config.model.output_sequence_length = 1
 
@@ -90,4 +93,7 @@ def run_experiment():
 
 
 if __name__ == "__main__":
-    run_experiment()
+    num_steps_ = [0, 100000]
+
+    for num_steps in num_steps_:
+        run_experiment(num_steps_math=num_steps)
